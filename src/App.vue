@@ -379,6 +379,7 @@ body {
   line-height: 1.6;
   min-height: 100vh;
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @keyframes gradient {
@@ -398,9 +399,9 @@ body {
   margin: 0 auto;
   padding: 20px;
   min-height: 100vh;
-  background: rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 /* Анимации */
@@ -462,14 +463,16 @@ body {
 }
 
 .profile-card {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.18);
   border-radius: 16px;
   padding: 1.5rem;
   display: flex;
   gap: 1.5rem;
   position: relative;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(8px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .user-avatar {
@@ -478,7 +481,7 @@ body {
   border-radius: 50%;
   flex-shrink: 0;
   object-fit: cover;
-  border: 2px solid rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.25);
 }
 
 .user-info {
@@ -490,40 +493,45 @@ body {
   font-size: 1.4rem;
   margin-bottom: 0.8rem;
   word-break: break-word;
+  line-height: 1.3;
 }
 
 .user-stats {
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.8rem;
 }
 
 .stat-item {
   color: white;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   font-size: 0.95rem;
 }
 
 .icon {
   color: #FFD700;
+  flex-shrink: 0;
 }
 
 .request-button {
   background: linear-gradient(135deg, #e567e8, #d111cb);
   color: white;
   border: none;
-  padding: 0.3rem 0.8rem;
-  border-radius: 15px;
+  padding: 0.4rem 1rem;
+  border-radius: 12px;
   margin-left: 1rem;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all 0.2s;
   font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
 .request-button:hover {
   transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(229, 103, 232, 0.3);
 }
 
 /* Прогноз */
@@ -535,6 +543,7 @@ body {
   color: #fff;
   font-size: 1.4rem;
   margin-bottom: 1rem;
+  text-shadow: 0 2px 2px rgba(0,0,0,0.1);
 }
 
 .forecast-card {
@@ -542,17 +551,20 @@ body {
   border-radius: 16px;
   padding: 1.5rem;
   color: white;
-  backdrop-filter: blur(8px);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
 }
 
 .forecast-content {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.2rem;
 }
 
 .forecast-icon {
-  font-size: 1.8rem;
+  font-size: 2rem;
+  flex-shrink: 0;
 }
 
 /* Эмоции */
@@ -564,21 +576,23 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
 }
 
 .add-button {
   background: linear-gradient(135deg, #e567e8, #d111cb);
   color: white;
   border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 20px;
+  padding: 0.7rem 1.4rem;
+  border-radius: 16px;
   cursor: pointer;
-  transition: transform 0.2s;
+  transition: all 0.2s;
+  font-weight: 500;
 }
 
 .add-button:hover {
   transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(229, 103, 232, 0.3);
 }
 
 .emotions-table {
@@ -587,11 +601,12 @@ body {
   overflow: hidden;
   background: rgba(255,255,255,0.1);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .table-header {
   display: flex;
-  padding: 12px;
+  padding: 14px;
   background: rgba(255,255,255,0.15);
   border-bottom: 1px solid rgba(255,255,255,0.2);
   font-weight: 500;
@@ -603,12 +618,18 @@ body {
   padding: 1rem;
   border-top: 1px solid rgba(255,255,255,0.1);
   color: #fff;
+  transition: background 0.2s;
+}
+
+.emotion-row:hover {
+  background: rgba(255,255,255,0.05);
 }
 
 .day-col {
   width: 20%;
   text-align: center;
   font-weight: 500;
+  padding: 0 8px;
 }
 
 .emotion-col {
@@ -616,6 +637,7 @@ body {
   padding-left: 1rem;
   white-space: pre-wrap;
   word-break: break-word;
+  line-height: 1.4;
 }
 
 /* Модальные окна */
@@ -625,21 +647,22 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   align-items: center;
   justify-content: center;
-  backdrop-filter: blur(6px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   z-index: 1000;
 }
 
 .modal-content {
-  background: rgba(255,255,255,0.95);
+  background: rgba(255,255,255,0.98);
   padding: 2rem;
-  border-radius: 12px;
+  border-radius: 16px;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
   max-height: 90vh;
   overflow-y: auto;
 }
@@ -647,6 +670,7 @@ body {
 .modal-content h3 {
   margin-bottom: 1.5rem;
   color: #6c11ff;
+  font-size: 1.4rem;
 }
 
 .requests-list {
@@ -656,31 +680,34 @@ body {
 }
 
 .request-item {
-  background: rgba(108, 17, 255, 0.1);
+  background: rgba(108, 17, 255, 0.08);
   border: 2px solid #6c11ff;
-  border-radius: 8px;
-  padding: 0.8rem;
+  border-radius: 12px;
+  padding: 0.9rem;
   color: #6c11ff;
   cursor: pointer;
   transition: all 0.2s;
   text-align: center;
+  font-weight: 500;
 }
 
 .request-item:hover {
   background: #6c11ff;
   color: white;
+  transform: translateY(-2px);
 }
 
 textarea {
   width: 100%;
   height: 120px;
-  padding: 0.8rem;
-  border: 2px solid #eee;
-  border-radius: 8px;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
   margin-bottom: 1.5rem;
   resize: none;
   font-family: inherit;
   font-size: 16px;
+  line-height: 1.5;
 }
 
 .modal-actions {
@@ -693,68 +720,92 @@ textarea {
   background: #6c11ff;
   color: white;
   border: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
+  padding: 0.8rem 1.6rem;
+  border-radius: 12px;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: all 0.2s;
+  font-weight: 500;
 }
 
 .save-btn:hover {
   opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 .cancel-btn {
   background: none;
-  border: 2px solid #eee;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  padding: 0.8rem 1.6rem;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.2s;
+  transition: all 0.2s;
+  color: #666;
 }
 
 .cancel-btn:hover {
   background: #f8f9fa;
+  color: #333;
 }
 
 /* Форма регистрации */
 .input-group {
-  margin-bottom: 1rem;
+  margin-bottom: 1.2rem;
 }
 
 .input-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  color: #666;
+  margin-bottom: 0.6rem;
+  color: #444;
+  font-weight: 500;
 }
 
 .input-group input {
   width: 100%;
-  padding: 12px;
-  border: 2px solid #eee;
-  border-radius: 8px;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
   font-family: inherit;
   font-size: 16px;
-  min-height: 48px;
+  min-height: 50px;
   background: white;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
+  border-color: #6c11ff;
+  outline: none;
 }
 
 /* Адаптивность */
 @media (max-width: 480px) {
   .app-container {
     padding: 15px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .profile-card {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    padding: 1rem;
+    padding: 1.2rem;
+    gap: 1.2rem;
   }
 
   .user-avatar {
     margin-bottom: 1rem;
-    width: 70px;
-    height: 70px;
+    width: 72px;
+    height: 72px;
+  }
+
+  .user-name {
+    font-size: 1.3rem;
+  }
+
+  .request-button {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
   }
 
   .emotions-header {
@@ -769,21 +820,29 @@ textarea {
 
   .modal-actions {
     flex-direction: column;
+    gap: 0.8rem;
   }
 
   .save-btn, .cancel-btn {
     width: 100%;
-  }
-
-  .request-button {
-    margin-left: 0.5rem;
-    padding: 0.3rem 0.6rem;
-    font-size: 13px;
+    text-align: center;
   }
 
   .input-group input {
     font-size: 16px;
-    padding: 10px;
+    padding: 12px;
+  }
+}
+
+@supports not (backdrop-filter: blur(12px)) {
+  .profile-card,
+  .forecast-card,
+  .emotions-table {
+    background: rgba(255,255,255,0.95);
+  }
+  
+  .app-container {
+    background: rgba(255,255,255,0.98);
   }
 }
 </style>
