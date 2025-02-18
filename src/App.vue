@@ -232,6 +232,9 @@ export default {
             this.user.id = user.id || this.generateUserId()
             this.user.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Пользователь'
             this.user.avatar = user.photo_url || this.generateAvatar(user.first_name)
+            // Устанавливаем светлую тему
+            tg.setHeaderColor('#FFFFFF') // Белый цвет фона
+            tg.setBackgroundColor('#FFFFFF') // Белый цвет фона
             resolve()
           } else {
             reject('Данные пользователя Telegram не доступны')
@@ -364,6 +367,7 @@ export default {
 </script>
 
 <style>
+/* Базовые стили */
 /* Базовые стили */
 * {
   box-sizing: border-box;
