@@ -471,8 +471,8 @@ html, body {
 }
 
 .user-avatar {
-  width: 60px;
-  height: 60px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
 }
 
@@ -494,10 +494,12 @@ html, body {
   display: flex;
   align-items: center;
   gap: 5px;
+  font-weight: 600;
 }
 
 .icon {
   font-size: 1.2rem;
+  color: #ffcc26;
 }
 
 /* Прогноз */
@@ -588,7 +590,7 @@ html, body {
 }
 
 .modal-content {
-  background: white;
+  background: rgb(255, 255, 255 0.1);
   padding: 20px;
   border-radius: 10px;
   width: 80%;
