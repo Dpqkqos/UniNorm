@@ -495,7 +495,6 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  font-weight: 700;
 }
 
 .stat-item {
@@ -503,6 +502,7 @@ body {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  font-weight: 800;
 }
 
 .icon {
