@@ -374,6 +374,28 @@ export default {
   padding: 0;
 }
 
+html, body {
+    overflow: hidden;
+    height: 100%;
+}
+
+.app-container { /* Это основной контейнер твоего приложения */
+    overflow-y: auto; /* Разрешаем скроллить только содержимое */
+    height: 100%;
+    position: relative;
+}
+
+.background { /* Это твой задний фон */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    background-position: center;
+    z-index: -1; /* Отправляем фон назад */
+}
+
 body {
   background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
   background-size: 400% 400%;
