@@ -650,6 +650,7 @@ html, body {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.7);
+  height: 100%;
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
@@ -661,6 +662,7 @@ html, body {
   background: linear-gradient(45deg, #a70eff, #f00be9, #6c11ff);
   border-radius: 16px;
   padding: 20px;
+  height: 100%;
   width: 90%;
   max-width: 400px;
   border: 1px solid rgba(255, 255, 255, 0.2);
