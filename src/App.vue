@@ -374,11 +374,6 @@ export default {
   padding: 0;
 }
 
-html, body {
-    overflow: hidden;
-    height: 100%;
-}
-
 .app-container { /* Это основной контейнер твоего приложения */
     overflow-y: auto; /* Разрешаем скроллить только содержимое */
     height: 100%;
