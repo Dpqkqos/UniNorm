@@ -495,6 +495,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
+  font-weight: 700;
 }
 
 .stat-item {
