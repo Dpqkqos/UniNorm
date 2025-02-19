@@ -374,44 +374,21 @@ export default {
   padding: 0;
 }
 
-.app-container { /* Это основной контейнер твоего приложения */
-    overflow-y: auto; /* Разрешаем скроллить только содержимое */
-    height: 100%;
-    position: relative;
-}
-
-.background { /* Это твой задний фон */
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-size: cover;
-    background-position: center;
-    z-index: -1; /* Отправляем фон назад */
-}
-
-body {
+html, body {
+  height: 100%;
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 10s ease infinite;
-  font-family: 'Roboto', sans-serif;
-  line-height: 1.6;
-  min-height: 100vh;
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
 }
 
 @keyframes gradient {
-  0% {
-    background-position: 50% 0%;
-  }
-  50% {
-    background-position: 50% 100%;
-  }
-  100% {
-    background-position: 50% 0%;
-  }
+  0% { background-position: 50% 0%; }
+  50% { background-position: 50% 100%; }
+  100% { background-position: 50% 0%; }
 }
 
 .app-container {
@@ -466,6 +443,13 @@ body {
   transition: transform 0.4s ease;
 }
 
+/* Загрузчик */
+.loader {
+  color: #fff;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
 /* Профиль */
 .profile-section {
   margin-bottom: 2rem;
@@ -474,29 +458,22 @@ body {
 .main-title {
   color: #fff;
   font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-}
-
-.accent {
-  color: #ffb700;
-  margin-left: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .profile-card {
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 16px;
-  padding: 1.5rem;
   display: flex;
-  gap: 1.5rem;
   align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
 }
 
 .user-avatar {
-  width: 80px;
-  height: 80px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  border: 3px solid #fff;
 }
 
 .user-info {
@@ -504,36 +481,23 @@ body {
 }
 
 .user-name {
-  font-size: 1.4rem;
-  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
 }
 
 .user-stats {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 5px;
 }
 
 .stat-item {
-  font-size: 1rem;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-  font-weight: 800;
+  gap: 5px;
 }
 
 .icon {
-  color: #ffb700;
-}
-
-/* Кнопка запроса */
-.request-button {
-  background: none;
-  border: none;
-  color: #ffb700;
-  cursor: pointer;
-  font-size: 1rem;
-  text-decoration: underline;
+  font-size: 1.2rem;
 }
 
 /* Прогноз */
@@ -548,16 +512,20 @@ body {
 }
 
 .forecast-card {
-  background: rgba(255, 255, 255, 0.18);
-  padding: 1rem;
-  border-radius: 12px;
-  text-align: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
   color: #fff;
-  font-size: 1.2rem;
+}
+
+.forecast-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .forecast-icon {
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 /* Эмоции */
@@ -572,48 +540,41 @@ body {
 }
 
 .add-button {
-  background: #ffb700;
-  color: #fff;
+  padding: 8px 12px;
+  background: #ff0e6b;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  border-radius: 5px;
+  color: #fff;
   cursor: pointer;
 }
 
 .emotions-table {
-  margin-top: 1rem;
-  background: rgba(255, 255, 255, 0.18);
-  padding: 1rem;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px;
 }
 
-.table-header {
+.table-header, .emotion-row {
   display: flex;
   justify-content: space-between;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.emotion-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.emotion-row:last-child {
-  border-bottom: none;
-}
-
-.day-col {
-  color: #ffb700;
-}
-
-.emotion-col {
+  padding: 8px 0;
   color: #fff;
 }
 
-/* Модальные окна */
+.table-header {
+  font-weight: bold;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.day-col {
+  flex: 1;
+}
+
+.emotion-col {
+  flex: 3;
+}
+
+/* Модальное окно */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -624,99 +585,78 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 2rem;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #fff;
-  text-align: center;
-  width: 90%;
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
   max-width: 400px;
 }
 
-.modal-content h3 {
-  margin-bottom: 1rem;
-}
-
-.requests-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.request-item {
-  background: rgba(255, 255, 255, 0.3);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  color: #fff;
-}
-
-.request-item:hover {
-  background: rgba(255, 255, 255, 0.5);
-}
-
 .modal-actions {
-  margin-top: 1rem;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .save-btn {
-  background: #ffb700;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
+  background: #ff0e6b;
+  color: white;
 }
 
 .cancel-btn {
-  background: rgba(255, 255, 255, 0.3);
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
+  background: rgba(0, 0, 0, 0.1);
 }
 
-textarea {
-  width: 100%;
-  height: 80px;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: none;
-  resize: none;
-  font-size: 1rem;
-}
-
+/* Форма регистрации */
 .input-group {
-  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
 }
 
 .input-group label {
-  display: block;
-  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 3px;
 }
 
 .input-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: none;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-@media (max-width: 480px) {
-  .profile-card {
-    flex-direction: column;
-    text-align: center;
-  }
+.request-button {
+  background: none;
+  border: none;
+  color: #ff0e6b;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+/* Кнопки выбора запроса */
+.requests-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.request-item {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #ff0e6b;
+  color: white;
 }
 </style>
