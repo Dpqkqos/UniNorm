@@ -258,7 +258,7 @@ export default {
     },
 
     deleteEmotion(index) {
-      this.user.emotions.splice(index, 1)
+      this.user.emotions.splice(this.user.emotions.length - 1 - index, 1)
       this.saveUserData()
     },
 
@@ -386,6 +386,8 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');  
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -394,13 +396,13 @@ export default {
 
 html, body {
   height: 100%;
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Monsterrat', sans-serif;
   line-height: 1.6;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
+  background: linear-gradient(45deg, #ff0364, #ff05f7, #6c11ff);
   background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
+  animation: gradient 3s ease infinite;
   overflow: hidden;
 }
 
@@ -424,29 +426,83 @@ html, body {
   scroll-behavior: smooth;
 }
 
+/* Модальное окно */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(255, 255, 255, 0.85); /* Без блюра */
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5); /* Затемнение без размытия */
   display: flex;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
-.modal {
-  background: #fff;
+.modal-content {
+  background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
+  border-radius: 16px;
   padding: 20px;
-  border-radius: 10px;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-  z-index: 1001;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  color: #fff; /* Белый текст для контраста */
 }
 
+.modal-content h3 {
+  color: #fff;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.modal-content textarea {
+  width: 100%;
+  height: 100px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+.modal-content textarea::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.save-btn {
+  background: #ff3bff;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #e62ee6;
+}
+
+.cancel-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
 
 @media (max-width: 600px) {
   html, body {
@@ -616,7 +672,7 @@ html, body {
   border-radius: 5px;
   color: #fff;
   cursor: pointer;
-  transition: color .3s ease ;
+  transition: color 0.3s ease;
 }
 
 .add-button:hover {
@@ -663,70 +719,6 @@ html, body {
   padding: 0 8px;
 }
 
-/* Модальное окно */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: linear-gradient(45deg, #fb2bff, #f00be9, #ff06fb);
-  border-radius: 16px;
-  padding: 20px;
-  width: 90%;
-  max-width: 400px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-}
-
-.modal-content h3 {
-  color: #fff;
-  margin-bottom: 15px;
-  font-size: 1.3rem;
-}
-
-.modal-content textarea {
-  width: 100%;
-  height: 100px;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  margin-bottom: 15px;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.save-btn, .cancel-btn {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.save-btn {
-  background: #ff3bff;
-  color: white;
-}
-
-.cancel-btn {
-  background: rgba(0, 0, 0, 0.1);
-}
-
 /* Форма регистрации */
 .input-group {
   display: flex;
@@ -736,7 +728,7 @@ html, body {
 
 .input-group label {
   font-size: 0.9rem;
-  color: #333;
+  color: #fff;
   margin-bottom: 3px;
 }
 
@@ -744,17 +736,25 @@ html, body {
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.input-group input::placeholder {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .request-button {
-  background: none;
+  padding: 8px 12px;
+  background: #ff0e6b;
   border: none;
-  color: #ff0e6b;
+  border-radius: 5px;
+  color: #fff;
   cursor: pointer;
-  margin-left: 5px;
+  transition: color 0.3s ease;
 }
 
-.add-button:hover {
+.request-button:hover {
   color: #000;
 }
 
@@ -773,5 +773,4 @@ html, body {
   background: #fb0eff;
   color: white;
 }
-
 </style>
