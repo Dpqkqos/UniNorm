@@ -232,9 +232,6 @@ export default {
             this.user.id = user.id || this.generateUserId()
             this.user.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Пользователь'
             this.user.avatar = user.photo_url || this.generateAvatar(user.first_name)
-            // Устанавливаем светлую тему
-            tg.setHeaderColor('#FFFFFF') // Белый цвет фона
-            tg.setBackgroundColor('#FFFFFF') // Белый цвет фона
             resolve()
           } else {
             reject('Данные пользователя Telegram не доступны')
@@ -374,269 +371,481 @@ export default {
   padding: 0;
 }
 
-html, body {
-  height: 100%;
-  font-family: 'Roboto', sans-serif;
-  line-height: 1.6;
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
+body {
   background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 10s ease infinite;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden; /* Убираем скролл при открытии модального окна */
+  font-family: 'Roboto', sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 @keyframes gradient {
-  0% { background-position: 50% 0%; }
-  50% { background-position: 50% 100%; }
-  100% { background-position: 50% 0%; }
+  0% {
+    background-position: 50% 0%;
+  }
+  50% {
+    background-position: 50% 100%;
+  }
+  100% {
+    background-position: 50% 0%;
+  }
 }
 
 .app-container {
   max-width: 600px;
-  width: 100%;
-  margin: 20px;
+  margin: 0 auto;
   padding: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  min-height: 100vh;
+  background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 16px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  color: white;
+}
+
+/* Анимации */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.4s ease;
+  position: absolute;
+}
+
+.list-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-move {
+  transition: transform 0.4s ease;
 }
 
 /* Профиль */
 .profile-section {
-  text-align: center;
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
+}
+
+.main-title {
+  color: #fff;
+  font-size: 1.8rem;
+  margin-bottom: 1.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.accent {
+  color: #ffb700;
+  margin-left: 0.5rem;
 }
 
 .profile-card {
+  background: rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  padding: 1.5rem;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 15px;
-  padding: 15px;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.2);
+  gap: 1.5rem;
+  position: relative;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .user-avatar {
   width: 80px;
   height: 80px;
   border-radius: 50%;
+  flex-shrink: 0;
   object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.25);
 }
 
 .user-info {
-  text-align: center;
+  flex-grow: 1;
 }
 
 .user-name {
+  color: white;
   font-size: 1.4rem;
-  font-weight: bold;
+  margin-bottom: 0.8rem;
+  word-break: break-word;
+  line-height: 1.3;
 }
 
-/* Кнопка запроса */
-.request-button {
-  margin-left: 10px;
-  background: none;
-  border: 1px solid white;
+.user-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.stat-item {
   color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+}
+
+.icon {
+  color: #FFD700;
+  flex-shrink: 0;
+}
+
+.request-button {
+  background: linear-gradient(135deg, #e567e8, #d111cb);
+  color: white;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 12px;
+  margin-left: 1rem;
   cursor: pointer;
-  transition: 0.3s;
+  transition: all 0.2s;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
 }
 
 .request-button:hover {
-  background: white;
-  color: black;
-}
-
-/* Модальное окно */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 20px;
-}
-
-.modal-content {
-  background: white;
-  padding: 20px;
-  border-radius: 12px;
-  width: 100%;
-  max-width: 400px;
-  text-align: center;
-  color: black;
-}
-
-.modal-actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-}
-
-.save-btn, .cancel-btn {
-  padding: 10px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.save-btn {
-  background: #6c11ff;
-  color: white;
-}
-
-.cancel-btn {
-  background: lightgray;
-}
-
-.save-btn:hover {
-  background: #4a0db2;
-}
-
-.cancel-btn:hover {
-  background: gray;
-}
-
-/* Список запросов */
-.requests-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 15px;
-}
-
-.request-item {
-  padding: 10px;
-  background: #6c11ff;
-  color: white;
-  border-radius: 5px;
-  cursor: pointer;
-  border: none;
-}
-
-.request-item:hover {
-  background: #4a0db2;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(229, 103, 232, 0.3);
 }
 
 /* Прогноз */
 .forecast-section {
-  margin-top: 20px;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  color: #fff;
+  font-size: 1.4rem;
+  margin-bottom: 1rem;
+  text-shadow: 0 2px 2px rgba(0,0,0,0.1);
 }
 
 .forecast-card {
-  padding: 15px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.2);
-  text-align: center;
+  background: rgba(255,255,255,0.15);
+  border-radius: 16px;
+  padding: 1.5rem;
+  color: white;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
+.forecast-content {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
 }
 
 .forecast-icon {
-  font-size: 24px;
-  display: block;
-  margin-bottom: 10px;
+  font-size: 2rem;
+  flex-shrink: 0;
 }
 
-/* Таблица эмоций */
+/* Эмоции */
 .emotions-section {
-  margin-top: 20px;
+  margin-top: 2rem;
 }
 
 .emotions-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 1.2rem;
 }
 
 .add-button {
-  background: #ff0e6b;
+  background: linear-gradient(135deg, #e567e8, #d111cb);
   color: white;
   border: none;
-  padding: 5px 10px;
-  border-radius: 5px;
+  padding: 0.7rem 1.4rem;
+  border-radius: 16px;
   cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
 }
 
 .add-button:hover {
-  background: #d00b5e;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(229, 103, 232, 0.3);
 }
 
 .emotions-table {
-  margin-top: 10px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 12px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
 }
 
 .table-header {
   display: flex;
-  justify-content: space-between;
-  font-weight: bold;
+  padding: 14px;
+  background: rgba(255,255,255,0.15);
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  font-weight: 500;
+  color: #fff;
 }
 
 .emotion-row {
   display: flex;
-  justify-content: space-between;
-  padding: 5px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  color: #fff;
+  transition: background 0.2s;
 }
 
-.emotion-row:first-child {
-  border-top: none;
+.emotion-row:hover {
+  background: rgba(255,255,255,0.05);
 }
 
-/* Модальное окно эмоций */
+.day-col {
+  width: 20%;
+  text-align: center;
+  font-weight: 500;
+  padding: 0 8px;
+}
+
+.emotion-col {
+  width: 80%;
+  padding-left: 1rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.4;
+}
+
+/* Модальные окна */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1000;
+}
+
+.modal-content {
+  background: rgba(255,255,255,0.98);
+  padding: 2rem;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-content h3 {
+  margin-bottom: 1.5rem;
+  color: #6c11ff;
+  font-size: 1.4rem;
+}
+
+.requests-list {
+  display: grid;
+  gap: 0.8rem;
+  margin-bottom: 1.5rem;
+}
+
+.request-item {
+  background: rgba(108, 17, 255, 0.08);
+  border: 2px solid #6c11ff;
+  border-radius: 12px;
+  padding: 0.9rem;
+  color: #6c11ff;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  font-weight: 500;
+}
+
+.request-item:hover {
+  background: #6c11ff;
+  color: white;
+  transform: translateY(-2px);
+}
+
 textarea {
   width: 100%;
-  padding: 10px;
-  border-radius: 5px;
-  border: 1px solid lightgray;
+  height: 120px;
+  padding: 1rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
   resize: none;
+  font-family: inherit;
+  font-size: 16px;
+  line-height: 1.5;
 }
 
-textarea:focus {
-  outline: none;
+.modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.save-btn {
+  background: #6c11ff;
+  color: white;
+  border: none;
+  padding: 0.8rem 1.6rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.save-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.cancel-btn {
+  background: none;
+  border: 2px solid #e0e0e0;
+  padding: 0.8rem 1.6rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #666;
+}
+
+.cancel-btn:hover {
+  background: #f8f9fa;
+  color: #333;
+}
+
+/* Форма регистрации */
+.input-group {
+  margin-bottom: 1.2rem;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.6rem;
+  color: #444;
+  font-weight: 500;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 16px;
+  min-height: 50px;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.input-group input:focus {
   border-color: #6c11ff;
+  outline: none;
 }
 
-/* Анимации */
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s;
+/* Адаптивность */
+@media (max-width: 480px) {
+  .app-container {
+    padding: 15px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .profile-card {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1.2rem;
+    gap: 1.2rem;
+  }
+
+  .user-avatar {
+    margin-bottom: 1rem;
+    width: 72px;
+    height: 72px;
+  }
+
+  .user-name {
+    font-size: 1.3rem;
+  }
+
+  .request-button {
+    margin-left: 0;
+    margin-top: 0.5rem;
+    width: 100%;
+  }
+
+  .emotions-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .modal-content {
+    padding: 1.5rem;
+  }
+
+  .modal-actions {
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .save-btn, .cancel-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .input-group input {
+    font-size: 16px;
+    padding: 12px;
+  }
 }
 
-.fade-enter, .fade-leave-to {
-  opacity: 0;
+@supports not (backdrop-filter: blur(12px)) {
+  .profile-card,
+  .forecast-card,
+  .emotions-table {
+    background: rgba(255,255,255,0.95);
+  }
+  
+  .app-container {
+    background: rgba(255,255,255,0.98);
+  }
 }
-
-.slide-up-enter-active, .slide-up-leave-active {
-  transition: transform 0.3s ease-out, opacity 0.3s;
-}
-
-.slide-up-enter, .slide-up-leave-to {
-  opacity: 0;
-  transform: translateY(20px);
-}
-
-.list-enter-active, .list-leave-active {
-  transition: all 0.3s;
-}
-
-.list-enter, .list-leave-to {
-  opacity: 0;
-  transform: translateY(10px);
-}
-
 </style>
+почини код у меня в телеграмме карточка пользователя белая полностью на телефоне это мини приложение в боте
+используй
+https://telegram.org/js/telegram-web-app.js
