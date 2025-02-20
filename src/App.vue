@@ -597,7 +597,7 @@ html, body {
   padding: 20px;
   border-radius: 12px;
   max-width: 400px;
-  width: 100%;
+  width: 80%;
   text-align: center;
 }
 
