@@ -386,7 +386,7 @@ export default {
 </script>
 
 <style>
-/* Общие стили */
+/* Базовые стили */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -403,7 +403,6 @@ html, body {
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
   overflow: hidden;
-  color: white;
 }
 
 @keyframes gradient {
@@ -413,142 +412,245 @@ html, body {
 }
 
 .app-container {
-  width: 100%;
-  height: 100vh;
+  max-width: 600px;
+  margin: 0 auto;
   padding: 20px;
+  min-height: 100vh;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-radius: 12px;
+  border-radius: 16px;
   overflow-y: auto;
+  height: 100vh;
   scroll-behavior: smooth;
 }
 
-.main-title {
-  font-size: 22px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 15px;
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow: hidden;
 }
 
-.accent {
-  color: #FFD700;
+@media (max-width: 600px) {
+  html, body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  .app-container {
+    padding: 15px;
+    border-radius: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+/* Анимации */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-/* Лоадер */
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.4s ease;
+  position: absolute;
+}
+
+.list-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-move {
+  transition: transform 0.4s ease;
+}
+
+/* Загрузчик */
 .loader {
-  font-size: 16px;
+  color: #fff;
+  font-size: 1.5rem;
   text-align: center;
-  margin-top: 40px;
 }
 
 /* Профиль */
 .profile-section {
-  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.main-title {
+  color: #fff;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
 }
 
 .profile-card {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 12px;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
-  backdrop-filter: blur(10px);
-  margin-bottom: 15px;
 }
 
 .user-avatar {
-  width: 60px;
-  height: 60px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  margin-right: 12px;
-  border: 2px solid white;
 }
 
 .user-info {
-  flex: 1;
+  color: #fff;
 }
 
 .user-name {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 1.2rem;
 }
 
 .user-stats {
-  margin-top: 5px;
-  font-size: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-/* Кнопка */
-.request-button, .add-button, .save-btn {
-  padding: 6px 12px;
-  background: #FFD700;
-  color: black;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.stat-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 600;
 }
 
-.request-button:hover, .add-button:hover, .save-btn:hover {
-  background: #FFC107;
+.icon {
+  font-size: 1.2rem;
+  color: #ffcc26;
 }
 
 /* Прогноз */
 .forecast-section {
-  text-align: center;
-  margin-bottom: 15px;
+  margin-bottom: 2rem;
+}
+
+.section-title {
+  color: #fff;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .forecast-card {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 12px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
-  backdrop-filter: blur(10px);
+  color: #fff;
+}
+
+.forecast-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.forecast-icon {
+  font-size: 1.5rem;
 }
 
 /* Эмоции */
 .emotions-section {
-  margin-bottom: 15px;
+  margin-bottom: 2rem;
 }
 
-.section-title {
-  font-size: 16px;
-  font-weight: bold;
+.emotions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.add-button {
+  padding: 8px 12px;
+  background: #ff0e6b;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  cursor: pointer;
 }
 
 .emotions-table {
-  margin-top: 10px;
-  background: rgba(255, 255, 255, 0.1);
-  padding: 8px;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
-  backdrop-filter: blur(10px);
+  padding: 10px;
 }
 
 .table-header, .emotion-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  font-size: 14px;
-  padding: 5px 0;
+  padding: 8px 0;
+  color: #fff;
+}
+
+.table-header {
+  font-weight: bold;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.day-col {
+  flex: 1;
+}
+
+.emotion-col {
+  flex: 3;
+}
+
+.action-col {
+  width: 40px;
+  text-align: right;
 }
 
 .delete-btn {
   background: none;
   border: none;
-  color: red;
-  font-size: 18px;
+  color: #ff3b3b;
+  font-size: 1.5rem;
   cursor: pointer;
+  padding: 0 8px;
 }
 
-.delete-btn:hover {
-  color: darkred;
-}
-
-/* Модальные окна */
+/* Модальное окно */
 .modal-overlay {
   position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  height: 100%;
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
@@ -557,80 +659,117 @@ html, body {
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 15px;
-  border-radius: 10px;
-  backdrop-filter: blur(10px);
-  text-align: center;
+  background: linear-gradient(45deg, #a70eff, #f00be9, #6c11ff);
+  border-radius: 16px;
+  padding: 20px;
+  height: 100%;
   width: 90%;
-  max-width: 360px;
+  max-width: 400px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-/* Поля ввода */
+.modal-content h3 {
+  color: #fff;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.modal-content textarea {
+  width: 100%;
+  height: 100px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  margin-bottom: 15px;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.save-btn {
+  background: #ff3bff;
+  color: white;
+}
+
+.cancel-btn {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+/* Форма регистрации */
 .input-group {
-  margin-bottom: 8px;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
 }
 
 .input-group label {
-  display: block;
-  font-weight: bold;
-  font-size: 14px;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 3px;
 }
 
 .input-group input {
-  width: 100%;
-  padding: 6px;
-  border: 1px solid white;
+  padding: 8px;
+  border: 1px solid #ccc;
   border-radius: 5px;
-  background: rgba(255, 255, 255, 0.1);
+}
+
+.request-button {
+  background: none;
+  border: none;
+  color: #ff0e6b;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+/* Кнопки выбора запроса */
+.requests-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.request-item {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #fb0eff;
   color: white;
-  font-size: 14px;
 }
 
-.input-group input:focus {
-  outline: none;
-  border-color: #FFD700;
-}
-
-/* Анимации */
-.fade-enter-active, .fade-leave-active {
-  transition: opacity 0.3s;
-}
-
-.fade-enter, .fade-leave-to {
-  opacity: 0;
-}
-
-.list-enter-active, .list-leave-active {
-  transition: all 0.3s;
-}
-
-.list-enter, .list-leave-to {
-  opacity: 0;
-  transform: translateY(-10px);
-}
-
-/* Адаптация под Telegram Web Apps */
+/* Адаптация для мобильных */
 @media (max-width: 600px) {
   .app-container {
-    padding: 10px;
+    padding: 15px;
     border-radius: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
   }
-
+  
   .profile-card {
     flex-direction: column;
     text-align: center;
   }
-
+  
   .user-avatar {
-    margin-bottom: 8px;
+    width: 100px;
+    height: 100px;
   }
-
+  
   .modal-content {
-    max-width: 320px;
+    width: 95%;
   }
 }
 </style>
