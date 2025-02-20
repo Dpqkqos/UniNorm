@@ -16,7 +16,7 @@
               <div class="user-stats">
                 <div class="stat-item">
                   <span class="icon">✦</span>
-                  {{ user.daysOnPlatform }} {{ daysText }} на платформе
+                  {{ user.daysOnPlatform }} дня на платформе
                 </div>
                 <div class="stat-item">
                   <span class="icon">✦</span>
@@ -80,7 +80,6 @@
             <div class="table-header">
               <div class="day-col">День</div>
               <div class="emotion-col">Эмоциональное состояние</div>
-              <div class="action-col"></div>
             </div>
 
             <transition-group name="list" tag="div">
@@ -91,9 +90,6 @@
               >
                 <div class="day-col">{{ totalEmotions - index }}</div>
                 <div class="emotion-col">{{ emotion.state }}</div>
-                <div class="action-col">
-                  <button @click.stop="deleteEmotion(index)" class="delete-btn">×</button>
-                </div>
               </div>
             </transition-group>
           </div>
@@ -201,14 +197,6 @@ export default {
     },
     totalEmotions() {
       return this.user.emotions.length
-    },
-    daysText() {
-      const days = this.user.daysOnPlatform
-      const last = days % 10
-      if (days > 10 && days < 20) return 'дней'
-      if (last === 1) return 'день'
-      if (last > 1 && last < 5) return 'дня'
-      return 'дней'
     }
   },
   mounted() {
@@ -244,8 +232,9 @@ export default {
             this.user.id = user.id || this.generateUserId()
             this.user.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Пользователь'
             this.user.avatar = user.photo_url || this.generateAvatar(user.first_name)
-            tg.expand()
-            tg.enableClosingConfirmation()
+            // Устанавливаем светлую тему
+            tg.setHeaderColor('#FFFFFF') // Белый цвет фона
+            tg.setBackgroundColor('#FFFFFF') // Белый цвет фона
             resolve()
           } else {
             reject('Данные пользователя Telegram не доступны')
@@ -255,11 +244,6 @@ export default {
           resolve()
         }
       })
-    },
-
-    deleteEmotion(index) {
-      this.user.emotions.splice(index, 1)
-      this.saveUserData()
     },
 
     generateUserId() {
@@ -283,9 +267,6 @@ export default {
         }
         this.saveUserData()
         this.showRegistrationForm = false
-        if (window.Telegram?.WebApp) {
-          window.Telegram.WebApp.close()
-        }
       }
     },
 
@@ -401,14 +382,13 @@ html, body {
   -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
   background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
-  overflow: hidden;
+  animation: gradient 10s ease infinite;
 }
 
 @keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+  0% { background-position: 50% 0%; }
+  50% { background-position: 50% 100%; }
+  100% { background-position: 50% 0%; }
 }
 
 .app-container {
@@ -420,161 +400,180 @@ html, body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
-  overflow-y: auto;
-  height: 100vh;
-  scroll-behavior: smooth;
+}
+
+/* Анимации */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.4s ease;
+  position: absolute;
+}
+
+.list-enter-from {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.list-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.list-move {
+  transition: transform 0.4s ease;
 }
 
 /* Загрузчик */
 .loader {
-  font-size: 18px;
-  font-weight: bold;
+  color: #fff;
+  font-size: 1.5rem;
   text-align: center;
-  padding: 20px;
-  color: white;
 }
 
 /* Профиль */
 .profile-section {
-  text-align: center;
-  color: white;
+  margin-bottom: 2rem;
 }
 
 .main-title {
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.accent {
-  color: #ff0e6b;
+  color: #fff;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
 }
 
 .profile-card {
   display: flex;
   align-items: center;
   gap: 15px;
-  background: rgba(255, 255, 255, 0.1);
   padding: 15px;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
 }
 
 .user-avatar {
-  width: 60px;
-  height: 60px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  border: 2px solid white;
 }
 
 .user-info {
-  text-align: left;
+  color: #fff;
 }
 
 .user-name {
-  font-size: 18px;
-  font-weight: bold;
+  font-size: 1.2rem;
 }
 
 .user-stats {
-  font-size: 14px;
-  margin-top: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
 .stat-item {
   display: flex;
   align-items: center;
   gap: 5px;
+  font-weight: 600;
 }
 
 .icon {
-  color: #ff05f7;
-}
-
-.request-button {
-  background: none;
-  border: none;
-  color: #ff0e6b;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 5px;
+  font-size: 1.2rem;
+  color: #ffcc26;
 }
 
 /* Прогноз */
 .forecast-section {
-  margin-top: 20px;
-  text-align: center;
-  color: white;
+  margin-bottom: 2rem;
 }
 
 .section-title {
-  font-size: 20px;
-  font-weight: bold;
+  color: #fff;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .forecast-card {
-  background: rgba(255, 255, 255, 0.1);
   padding: 15px;
-  border-radius: 12px;
-  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: #fff;
 }
 
 .forecast-content {
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 10px;
 }
 
 .forecast-icon {
-  font-size: 24px;
+  font-size: 1.5rem;
 }
 
 /* Эмоции */
 .emotions-section {
-  margin-top: 20px;
+  margin-bottom: 2rem;
 }
 
 .emotions-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  color: white;
 }
 
 .add-button {
-  background: #ff0e6b;
-  color: white;
-  border: none;
   padding: 8px 12px;
-  border-radius: 8px;
+  background: #ff0e6b;
+  border: none;
+  border-radius: 5px;
+  color: #fff;
   cursor: pointer;
 }
 
 .emotions-table {
-  margin-top: 10px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
   padding: 10px;
-  border-radius: 12px;
 }
 
-.table-header,
-.emotion-row {
+.table-header, .emotion-row {
   display: flex;
   justify-content: space-between;
-  padding: 10px;
-  color: white;
+  padding: 8px 0;
+  color: #fff;
 }
 
-.emotion-row {
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
+.table-header {
+  font-weight: bold;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-.delete-btn {
-  background: none;
-  border: none;
-  color: #ff0e6b;
-  cursor: pointer;
-  font-size: 18px;
+.day-col {
+  flex: 1;
+}
+
+.emotion-col {
+  flex: 3;
 }
 
 /* Модальное окно */
@@ -582,38 +581,33 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(5px);
+  width: 400px;
+  height: 200px;
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
 }
 
 .modal-content {
-  background: white;
+  background: rgb(255, 255, 255 0.1);
   padding: 20px;
-  border-radius: 12px;
-  max-width: 400px;
+  border-radius: 10px;
   width: 80%;
-  text-align: center;
+  max-width: 400px;
 }
 
 .modal-actions {
-  margin-top: 15px;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  margin-top: 15px;
 }
 
-.save-btn,
-.cancel-btn {
+.save-btn, .cancel-btn {
   padding: 8px 12px;
   border: none;
+  border-radius: 5px;
   cursor: pointer;
-  border-radius: 8px;
-  font-size: 14px;
 }
 
 .save-btn {
@@ -622,71 +616,54 @@ html, body {
 }
 
 .cancel-btn {
-  background: #ccc;
+  background: rgba(0, 0, 0, 0.1);
 }
 
 /* Форма регистрации */
 .input-group {
-  margin: 10px 0;
-  text-align: left;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
 }
 
 .input-group label {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 5px;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 3px;
 }
 
 .input-group input {
-  width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
-  border-radius: 8px;
+  border-radius: 5px;
 }
 
-/* Анимации */
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: transform 0.5s ease, opacity 0.5s;
+.request-button {
+  background: none;
+  border: none;
+  color: #ff0e6b;
+  cursor: pointer;
+  margin-left: 5px;
 }
 
-.slide-up-enter {
-  transform: translateY(20px);
-  opacity: 0;
+/* Кнопки выбора запроса */
+.requests-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
-.slide-up-leave-to {
-  transform: translateY(-20px);
-  opacity: 0;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
-/* Медиа-запросы */
-@media (max-width: 600px) {
-  html, body {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-  }
-
-  .app-container {
-    padding: 15px;
-    border-radius: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .modal-content {
-    max-width: 90%;
-  }
+.request-item {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #ff0e6b;
+  color: white;
 }
 </style>
+стилизуй модальные окна под наши стили и еще добавь функцию удаления значений из таблицы
+также сделай чтобы где личная карточка слово день склонялось от количества дней условно 1 день на платформе 5 дней на платформе 3 дня на платформе также приклей задний чтобы он не двигаелся когда скролл вниз
+используй
+https://telegram.org/js/telegram-web-app.js
+если надо это мини приложение в тг боте
