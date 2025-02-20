@@ -428,6 +428,7 @@ html, body {
   width: 80px;
   height: 80px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .user-info {
@@ -464,82 +465,178 @@ html, body {
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
 .modal-content {
   background: white;
-  color: black;
   padding: 20px;
-  border-radius: 10px;
+  border-radius: 12px;
+  width: 100%;
   max-width: 400px;
-  width: 90%;
   text-align: center;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  color: black;
 }
 
+.modal-actions {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.save-btn, .cancel-btn {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.save-btn {
+  background: #6c11ff;
+  color: white;
+}
+
+.cancel-btn {
+  background: lightgray;
+}
+
+.save-btn:hover {
+  background: #4a0db2;
+}
+
+.cancel-btn:hover {
+  background: gray;
+}
+
+/* Список запросов */
 .requests-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  margin: 15px 0;
+  margin-top: 15px;
 }
 
 .request-item {
-  background: #ff05f7;
-  border: none;
-  color: white;
   padding: 10px;
+  background: #6c11ff;
+  color: white;
   border-radius: 5px;
   cursor: pointer;
-  transition: 0.3s;
+  border: none;
 }
 
 .request-item:hover {
-  background: #d004c2;
+  background: #4a0db2;
 }
 
-.modal-actions {
+/* Прогноз */
+.forecast-section {
+  margin-top: 20px;
+}
+
+.forecast-card {
+  padding: 15px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  text-align: center;
+}
+
+.forecast-icon {
+  font-size: 24px;
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* Таблица эмоций */
+.emotions-section {
+  margin-top: 20px;
+}
+
+.emotions-header {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px;
+  align-items: center;
 }
 
-.cancel-btn {
-  background: none;
-  border: 1px solid black;
-  padding: 8px 15px;
+.add-button {
+  background: #ff0e6b;
+  color: white;
+  border: none;
+  padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
-  transition: 0.3s;
 }
 
-.cancel-btn:hover {
-  background: black;
-  color: white;
+.add-button:hover {
+  background: #d00b5e;
 }
 
-/* Отключаем скролл при открытии модалки */
-body.modal-open {
-  overflow: hidden;
+.emotions-table {
+  margin-top: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px;
 }
 
-@media (max-width: 500px) {
-  .app-container {
-    padding: 15px;
-  }
-
-  .profile-card {
-    text-align: center;
-  }
-
-  .user-avatar {
-    width: 80px;
-    height: 80px;
-  }
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
 }
+
+.emotion-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.emotion-row:first-child {
+  border-top: none;
+}
+
+/* Модальное окно эмоций */
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid lightgray;
+  resize: none;
+}
+
+textarea:focus {
+  outline: none;
+  border-color: #6c11ff;
+}
+
+/* Анимации */
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s;
+}
+
+.fade-enter, .fade-leave-to {
+  opacity: 0;
+}
+
+.slide-up-enter-active, .slide-up-leave-active {
+  transition: transform 0.3s ease-out, opacity 0.3s;
+}
+
+.slide-up-enter, .slide-up-leave-to {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.list-enter-active, .list-leave-active {
+  transition: all 0.3s;
+}
+
+.list-enter, .list-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
 </style>
