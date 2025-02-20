@@ -428,16 +428,35 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.7);
-  -webkit-backdrop-filter: blur(10px); /* Для iPhone */
-  backdrop-filter: blur(5px);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.3); /* Вместо backdrop-filter */
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
-  overflow: hidden;
+}
+
+.modal-overlay::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: inherit;
+  filter: blur(10px); /* Создаем эффект блюра */
+  z-index: -1;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  z-index: 1001;
 }
 
 @media (max-width: 600px) {
@@ -765,5 +784,6 @@ html, body {
   background: #fb0eff;
   color: white;
 }
+
 
 </style>
