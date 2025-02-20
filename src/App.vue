@@ -383,6 +383,10 @@ html, body {
   background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 10s ease infinite;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Убираем скролл при открытии модального окна */
 }
 
 @keyframes gradient {
@@ -393,187 +397,63 @@ html, body {
 
 .app-container {
   max-width: 600px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 20px;
   padding: 20px;
-  min-height: 100vh;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
-}
-
-/* Анимации */
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-}
-
-.slide-up-enter-from {
-  opacity: 0;
-  transform: translateY(40px);
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.4s ease;
-  position: absolute;
-}
-
-.list-enter-from {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.list-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.list-move {
-  transition: transform 0.4s ease;
-}
-
-/* Загрузчик */
-.loader {
-  color: #fff;
-  font-size: 1.5rem;
-  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  color: white;
 }
 
 /* Профиль */
 .profile-section {
-  margin-bottom: 2rem;
-}
-
-.main-title {
-  color: #fff;
-  font-size: 1.8rem;
-  margin-bottom: 1rem;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .profile-card {
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 15px;
   padding: 15px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
 }
 
 .user-avatar {
-  width: 120px;
-  height: 120px;
+  width: 80px;
+  height: 80px;
   border-radius: 50%;
 }
 
 .user-info {
-  color: #fff;
+  text-align: center;
 }
 
 .user-name {
-  font-size: 1.2rem;
-}
-
-.user-stats {
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-weight: 600;
-}
-
-.icon {
-  font-size: 1.2rem;
-  color: #ffcc26;
-}
-
-/* Прогноз */
-.forecast-section {
-  margin-bottom: 2rem;
-}
-
-.section-title {
-  color: #fff;
-  font-size: 1.5rem;
-  margin-bottom: 1rem;
-}
-
-.forecast-card {
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  color: #fff;
-}
-
-.forecast-content {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.forecast-icon {
-  font-size: 1.5rem;
-}
-
-/* Эмоции */
-.emotions-section {
-  margin-bottom: 2rem;
-}
-
-.emotions-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.add-button {
-  padding: 8px 12px;
-  background: #ff0e6b;
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-}
-
-.emotions-table {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  padding: 10px;
-}
-
-.table-header, .emotion-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 8px 0;
-  color: #fff;
-}
-
-.table-header {
+  font-size: 1.4rem;
   font-weight: bold;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
 }
 
-.day-col {
-  flex: 1;
+/* Кнопка запроса */
+.request-button {
+  margin-left: 10px;
+  background: none;
+  border: 1px solid white;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-.emotion-col {
-  flex: 3;
+.request-button:hover {
+  background: white;
+  color: black;
 }
 
 /* Модальное окно */
@@ -581,84 +461,85 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  width: 400px;
-  height: 200px;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .modal-content {
-  background: rgb(255, 255, 255 0.1);
+  background: white;
+  color: black;
   padding: 20px;
   border-radius: 10px;
-  width: 80%;
   max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.requests-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 15px 0;
+}
+
+.request-item {
+  background: #ff05f7;
+  border: none;
+  color: white;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.request-item:hover {
+  background: #d004c2;
 }
 
 .modal-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 15px;
-}
-
-.save-btn, .cancel-btn {
-  padding: 8px 12px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.save-btn {
-  background: #ff0e6b;
-  color: white;
+  margin-top: 10px;
 }
 
 .cancel-btn {
-  background: rgba(0, 0, 0, 0.1);
-}
-
-/* Форма регистрации */
-.input-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 10px;
-}
-
-.input-group label {
-  font-size: 0.9rem;
-  color: #333;
-  margin-bottom: 3px;
-}
-
-.input-group input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.request-button {
   background: none;
-  border: none;
-  color: #ff0e6b;
-  cursor: pointer;
-  margin-left: 5px;
-}
-
-/* Кнопки выбора запроса */
-.requests-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.request-item {
-  padding: 8px 12px;
-  border: none;
+  border: 1px solid black;
+  padding: 8px 15px;
   border-radius: 5px;
   cursor: pointer;
-  background: #ff0e6b;
+  transition: 0.3s;
+}
+
+.cancel-btn:hover {
+  background: black;
   color: white;
+}
+
+/* Отключаем скролл при открытии модалки */
+body.modal-open {
+  overflow: hidden;
+}
+
+@media (max-width: 500px) {
+  .app-container {
+    padding: 15px;
+  }
+
+  .profile-card {
+    text-align: center;
+  }
+
+  .user-avatar {
+    width: 80px;
+    height: 80px;
+  }
 }
 </style>
