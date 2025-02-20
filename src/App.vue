@@ -21,9 +21,12 @@
                 <div class="stat-item">
                   <span class="icon">✦</span>
                   Ваш запрос: {{ user.request }}
-                  <button @click="showRequestModal = true" class="request-button">Изменить</button>
                 </div>
               </div>
+              <!-- Кнопка "Изменить запрос" -->
+              <button @click="showRequestModal = true" class="change-request-button">
+                Изменить запрос
+              </button>
             </div>
           </div>
         </div>
@@ -386,7 +389,7 @@ export default {
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');  
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 * {
   box-sizing: border-box;
@@ -396,13 +399,13 @@ export default {
 
 html, body {
   height: 100%;
-  font-family: 'Monsterrat', sans-serif;
+  font-family: 'Montserrat', sans-serif;
   line-height: 1.6;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  background: linear-gradient(45deg, #ff0364, #ff05f7, #6c11ff);
+  background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
   background-size: 400% 400%;
-  animation: gradient 3s ease infinite;
+  animation: gradient 15s ease infinite;
   overflow: hidden;
 }
 
@@ -449,6 +452,9 @@ html, body {
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   color: #fff; /* Белый текст для контраста */
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
 }
 
 .modal-content h3 {
@@ -475,7 +481,7 @@ html, body {
 .modal-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 15px;
+  margin-top: auto; /* Кнопки будут прижаты к низу */
 }
 
 .save-btn, .cancel-btn {
@@ -590,6 +596,7 @@ html, body {
   padding: 15px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
+  position: relative; /* Для позиционирования кнопки */
 }
 
 .user-avatar {
@@ -600,6 +607,9 @@ html, body {
 
 .user-info {
   color: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .user-name {
@@ -624,6 +634,25 @@ html, body {
 .icon {
   font-size: 1.2rem;
   color: #ffcc26;
+}
+
+/* Кнопка "Изменить запрос" */
+.change-request-button {
+  width: 100%;
+  padding: 12px 24px;
+  background: #ff0e6b;
+  border: none;
+  border-radius: 25px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: background 0.3s ease;
+  margin-top: 15px; /* Отступ сверху */
+}
+
+.change-request-button:hover {
+  background: #e62ee6;
 }
 
 /* Прогноз */
@@ -672,11 +701,11 @@ html, body {
   border-radius: 5px;
   color: #fff;
   cursor: pointer;
-  transition: color 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .add-button:hover {
-  color: #000;
+  background: #e62ee6;
 }
 
 .emotions-table {
@@ -742,20 +771,6 @@ html, body {
 
 .input-group input::placeholder {
   color: rgba(255, 255, 255, 0.7);
-}
-
-.request-button {
-  padding: 8px 12px;
-  background: #ff0e6b;
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-
-.request-button:hover {
-  color: #000;
 }
 
 /* Кнопки выбора запроса */
