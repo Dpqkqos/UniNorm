@@ -16,7 +16,7 @@
               <div class="user-stats">
                 <div class="stat-item">
                   <span class="icon">✦</span>
-                  {{ user.daysOnPlatform }} дня на платформе
+                  {{ user.daysOnPlatform }} {{ daysText }} на платформе
                 </div>
                 <div class="stat-item">
                   <span class="icon">✦</span>
@@ -80,6 +80,7 @@
             <div class="table-header">
               <div class="day-col">День</div>
               <div class="emotion-col">Эмоциональное состояние</div>
+              <div class="action-col"></div>
             </div>
 
             <transition-group name="list" tag="div">
@@ -90,6 +91,9 @@
               >
                 <div class="day-col">{{ totalEmotions - index }}</div>
                 <div class="emotion-col">{{ emotion.state }}</div>
+                <div class="action-col">
+                  <button @click.stop="deleteEmotion(index)" class="delete-btn">×</button>
+                </div>
               </div>
             </transition-group>
           </div>
@@ -197,6 +201,14 @@ export default {
     },
     totalEmotions() {
       return this.user.emotions.length
+    },
+    daysText() {
+      const days = this.user.daysOnPlatform
+      const last = days % 10
+      if (days > 10 && days < 20) return 'дней'
+      if (last === 1) return 'день'
+      if (last > 1 && last < 5) return 'дня'
+      return 'дней'
     }
   },
   mounted() {
@@ -232,9 +244,8 @@ export default {
             this.user.id = user.id || this.generateUserId()
             this.user.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Пользователь'
             this.user.avatar = user.photo_url || this.generateAvatar(user.first_name)
-            // Устанавливаем светлую тему
-            tg.setHeaderColor('#FFFFFF') // Белый цвет фона
-            tg.setBackgroundColor('#FFFFFF') // Белый цвет фона
+            tg.expand()
+            tg.enableClosingConfirmation()
             resolve()
           } else {
             reject('Данные пользователя Telegram не доступны')
@@ -244,6 +255,11 @@ export default {
           resolve()
         }
       })
+    },
+
+    deleteEmotion(index) {
+      this.user.emotions.splice(index, 1)
+      this.saveUserData()
     },
 
     generateUserId() {
@@ -267,6 +283,9 @@ export default {
         }
         this.saveUserData()
         this.showRegistrationForm = false
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.close()
+        }
       }
     },
 
@@ -367,34 +386,28 @@ export default {
 </script>
 
 <style>
-/* Базовые стили */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-body {
-  background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
-  background-size: 400% 400%;
-  animation: gradient 10s ease infinite;
+html, body {
+  height: 100%;
   font-family: 'Roboto', sans-serif;
   line-height: 1.6;
-  min-height: 100vh;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  overflow: hidden;
 }
 
 @keyframes gradient {
-  0% {
-    background-position: 50% 0%;
-  }
-  50% {
-    background-position: 50% 100%;
-  }
-  100% {
-    background-position: 50% 0%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .app-container {
@@ -406,6 +419,39 @@ body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
+  overflow-y: auto;
+  height: 100vh;
+  scroll-behavior: smooth;
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  overflow: hidden;
+}
+
+@media (max-width: 600px) {
+  html, body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  .app-container {
+    padding: 15px;
+    border-radius: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 }
 
 /* Анимации */
@@ -449,37 +495,42 @@ body {
   transition: transform 0.4s ease;
 }
 
+/* Загрузчик */
+.loader {
+  color: #fff;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
 /* Профиль */
 .profile-section {
   margin-bottom: 2rem;
 }
 
-.main-title {
-  color: #fff;
-  font-size: 1.8rem;
-  margin-bottom: 1.5rem;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+.accent {
+  color: #ffcc26;
 }
 
-.accent {
-  color: #ffb700;
-  margin-left: 0.5rem;
+.main-title {
+  text-align: center;
+  color: #fff;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
 }
 
 .profile-card {
-  background: rgba(255, 255, 255, 0.18);
-  border-radius: 16px;
-  padding: 1.5rem;
-  display: flex;
-  gap: 1.5rem;
+  text-align: center;
   align-items: center;
+  gap: 15px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
 }
 
 .user-avatar {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
-  border: 3px solid #fff;
 }
 
 .user-info {
@@ -487,35 +538,27 @@ body {
 }
 
 .user-name {
-  font-size: 1.4rem;
-  margin-bottom: 0.5rem;
+  text-align: center;
+  font-size: 1.2rem;
 }
 
 .user-stats {
+  text-align: center;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 5px;
 }
 
 .stat-item {
-  font-size: 1rem;
-  display: flex;
+  text-align: center;
   align-items: center;
-  gap: 0.5rem;
+  gap: 5px;
+  font-weight: 600;
 }
 
 .icon {
-  color: #ffb700;
-}
-
-/* Кнопка запроса */
-.request-button {
-  background: none;
-  border: none;
-  color: #ffb700;
-  cursor: pointer;
-  font-size: 1rem;
-  text-decoration: underline;
+  font-size: 1.2rem;
+  color: #ffcc26;
 }
 
 /* Прогноз */
@@ -530,16 +573,20 @@ body {
 }
 
 .forecast-card {
-  background: rgba(255, 255, 255, 0.18);
-  padding: 1rem;
-  border-radius: 12px;
-  text-align: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
   color: #fff;
-  font-size: 1.2rem;
+}
+
+.forecast-content {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .forecast-icon {
-  font-size: 2rem;
+  font-size: 1.5rem;
 }
 
 /* Эмоции */
@@ -554,55 +601,68 @@ body {
 }
 
 .add-button {
-  background: #ffb700;
-  color: #fff;
+  padding: 8px 12px;
+  background: #ff0e6b;
   border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
+  border-radius: 5px;
+  color: #fff;
   cursor: pointer;
+  transition: color .3s ease ;
+}
+
+.add-button:hover {
+  color: #000;
 }
 
 .emotions-table {
-  margin-top: 1rem;
-  background: rgba(255, 255, 255, 0.18);
-  padding: 1rem;
-  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  padding: 10px;
 }
 
-.table-header {
+.table-header, .emotion-row {
   display: flex;
   justify-content: space-between;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-}
-
-.emotion-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.emotion-row:last-child {
-  border-bottom: none;
-}
-
-.day-col {
-  color: #ffb700;
-}
-
-.emotion-col {
+  padding: 8px 0;
   color: #fff;
 }
 
-/* Модальные окна */
+.table-header {
+  font-weight: bold;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.day-col {
+  flex: 1;
+}
+
+.emotion-col {
+  flex: 3;
+}
+
+.action-col {
+  width: 40px;
+  text-align: right;
+}
+
+.delete-btn {
+  background: none;
+  border: none;
+  color: #ff3b3b;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0 8px;
+}
+
+/* Модальное окно */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.6);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -610,95 +670,99 @@ body {
 }
 
 .modal-content {
-  background: rgba(255, 255, 255, 0.2);
-  padding: 2rem;
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  color: #fff;
-  text-align: center;
+  background: linear-gradient(45deg, #fb2bff, #f00be9, #ff06fb);
+  border-radius: 16px;
+  padding: 20px;
   width: 90%;
   max-width: 400px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
 .modal-content h3 {
-  margin-bottom: 1rem;
-}
-
-.requests-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-}
-
-.request-item {
-  background: rgba(255, 255, 255, 0.3);
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
   color: #fff;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
 }
 
-.request-item:hover {
-  background: rgba(255, 255, 255, 0.5);
+.modal-content textarea {
+  width: 100%;
+  height: 100px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  margin-bottom: 15px;
 }
 
 .modal-actions {
-  margin-top: 1rem;
   display: flex;
-  justify-content: space-around;
+  justify-content: space-between;
+  margin-top: 15px;
+}
+
+.save-btn, .cancel-btn {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
 .save-btn {
-  background: #ffb700;
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
+  background: #ff3bff;
+  color: white;
 }
 
 .cancel-btn {
-  background: rgba(255, 255, 255, 0.3);
-  color: #fff;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
+  background: rgba(0, 0, 0, 0.1);
 }
 
-textarea {
-  width: 100%;
-  height: 80px;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: none;
-  resize: none;
-  font-size: 1rem;
-}
-
+/* Форма регистрации */
 .input-group {
-  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 10px;
 }
 
 .input-group label {
-  display: block;
-  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+  color: #333;
+  margin-bottom: 3px;
 }
 
 .input-group input {
-  width: 100%;
-  padding: 0.5rem;
-  border-radius: 8px;
-  border: none;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
-@media (max-width: 480px) {
-  .profile-card {
-    flex-direction: column;
-    text-align: center;
-  }
+.request-button {
+  background: none;
+  border: none;
+  color: #ff0e6b;
+  cursor: pointer;
+  margin-left: 5px;
 }
+
+.add-button:hover {
+  color: #000;
+}
+
+/* Кнопки выбора запроса */
+.requests-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.request-item {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #fb0eff;
+  color: white;
+}
+
 </style>
