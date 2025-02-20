@@ -431,6 +431,7 @@ html, body {
   right: 0;
   bottom: 0;
   background: rgba(0, 0, 0, 0.7);
+  -webkit-backdrop-filter: blur(10px); /* Для iPhone */
   backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
@@ -764,4 +765,5 @@ html, body {
   background: #fb0eff;
   color: white;
 }
+
 </style>
