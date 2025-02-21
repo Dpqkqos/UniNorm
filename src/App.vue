@@ -723,12 +723,13 @@ html, body {
 .emotions-table {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
+  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff); /* Градиентный фон */
+  background-size: 400% 400%; /* Размер фона для анимации */
+  animation: gradient 15s ease infinite; /* Анимация градиента */
   overflow: hidden;
   border-radius: 10px;
   padding: 10px;
+  color: #fff; /* Белый текст для контраста */
 }
 
 .table-header, .emotion-row {
