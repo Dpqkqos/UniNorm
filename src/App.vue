@@ -408,7 +408,7 @@ html, body {
   line-height: 1.6;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
+  background: #fff
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
   overflow: hidden;
@@ -449,7 +449,12 @@ html, body {
 }
 
 .modal-content {
-  background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  overflow: hidden;  
   border-radius: 16px;
   padding: 20px;
   width: 90%;
@@ -599,7 +604,12 @@ html, body {
   align-items: center;
   gap: 15px;
   padding: 15px;
-  background: rgba(255, 255, 255, 0.2);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  overflow: hidden;
   border-radius: 10px;
   position: relative; /* Для позиционирования кнопки */
 }
@@ -672,6 +682,12 @@ html, body {
 }
 
 .forecast-card {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  overflow: hidden;
   padding: 15px;
   background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
@@ -714,7 +730,12 @@ html, body {
 }
 
 .emotions-table {
-  background: rgba(255, 255, 255, 0.2);
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  overflow: hidden;
   border-radius: 10px;
   padding: 10px;
 }
