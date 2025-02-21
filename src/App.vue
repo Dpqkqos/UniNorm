@@ -426,12 +426,12 @@ html, body {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
-  min-height: 100vh; /* Используем min-height для корректной высоты */
+  min-height: 100vh;
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
-  overflow-y: auto; /* Разрешаем прокрутку внутри контейнера */
+  overflow-y: auto;
   scroll-behavior: smooth;
 }
 
@@ -705,12 +705,13 @@ html, body {
   border-radius: 10px;
   padding: 10px;
   margin: 15px 0;
+  font-size: 0.9rem; /* Уменьшенный шрифт */
 }
 
 .table-header, .emotion-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
+  padding: 6px 0; /* Уменьшенные отступы */
   color: #fff;
 }
 
@@ -728,7 +729,7 @@ html, body {
 }
 
 .action-col {
-  width: 40px;
+  width: 30px; /* Уменьшенная ширина */
   text-align: right;
 }
 
@@ -736,9 +737,9 @@ html, body {
   background: none;
   border: none;
   color: #ff3b3b;
-  font-size: 1.5rem;
+  font-size: 1.2rem; /* Уменьшенный размер иконки */
   cursor: pointer;
-  padding: 0 8px;
+  padding: 0 4px; /* Уменьшенные отступы */
 }
 
 /* Форма регистрации */
@@ -800,6 +801,11 @@ html, body {
 
   .emotions-table {
     margin: 10px 0;
+    font-size: 0.8rem; /* Ещё меньше шрифт на мобильных */
+  }
+
+  .table-header, .emotion-row {
+    padding: 4px 0; /* Ещё меньше отступы на мобильных */
   }
 }
 </style>
