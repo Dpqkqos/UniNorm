@@ -408,7 +408,7 @@ html, body {
   line-height: 1.6;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  background: linear-gradient(45deg, #ff0e6b, #ff05f7, #6c11ff);
+  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
   overflow: hidden;
