@@ -261,7 +261,12 @@ export default {
     },
 
     deleteEmotion(index) {
+      // Удаляем эмоцию по индексу
       this.user.emotions.splice(this.user.emotions.length - 1 - index, 1)
+      // Обновляем нумерацию дней
+      this.user.emotions.forEach((emotion, i) => {
+        emotion.day = i + 1
+      })
       this.saveUserData()
     },
 
