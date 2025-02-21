@@ -76,7 +76,7 @@
         <div class="emotions-section">
           <div class="emotions-header">
             <h2 class="section-title">Ведение эмоционального состояния<span class="accent">✦</span></h2>
-            <button @click="showModal = true" class="add-button">+ Добавить</button>
+            <button @click="showAddModal = true" class="add-button">+ Добавить</button>
           </div>
 
           <div class="emotions-table">
@@ -95,6 +95,7 @@
                 <div class="day-col">{{ totalEmotions - index }}</div>
                 <div class="emotion-col">{{ emotion.state }}</div>
                 <div class="action-col">
+                  <button @click.stop="openEditModal(index)" class="edit-btn">✎</button>
                   <button @click.stop="deleteEmotion(index)" class="delete-btn">×</button>
                 </div>
               </div>
@@ -103,12 +104,12 @@
         </div>
       </transition>
 
-      <!-- Модальное окно эмоций -->
+      <!-- Модальное окно добавления эмоции -->
       <transition name="fade">
         <div 
-          v-if="showModal" 
+          v-if="showAddModal" 
           class="modal-overlay"
-          @click.self="showModal = false"
+          @click.self="showAddModal = false"
         >
           <div class="modal-content">
             <h3>Опишите ваше состояние</h3>
@@ -120,38 +121,30 @@
             ></textarea>
             <div class="modal-actions" :class="{ 'keyboard-open': isKeyboardOpen }">
               <button @click="addEmotion" class="save-btn">Сохранить</button>
-              <button @click="showModal = false" class="cancel-btn">Отмена</button>
+              <button @click="showAddModal = false" class="cancel-btn">Отмена</button>
             </div>
           </div>
         </div>
       </transition>
 
-      <!-- Форма регистрации -->
+      <!-- Модальное окно редактирования эмоции -->
       <transition name="fade">
         <div 
-          v-if="showRegistrationForm" 
+          v-if="showEditModal" 
           class="modal-overlay"
+          @click.self="showEditModal = false"
         >
           <div class="modal-content">
-            <h3>Заполните ваши данные</h3>
-            <div class="input-group">
-              <label>Имя:</label>
-              <input v-model="registrationForm.firstName" type="text" required>
-            </div>
-            <div class="input-group">
-              <label>Фамилия:</label>
-              <input v-model="registrationForm.lastName" type="text" required>
-            </div>
-            <div class="input-group">
-              <label>Дата рождения:</label>
-              <input v-model="registrationForm.birthDate" type="date" required>
-            </div>
-            <div class="input-group">
-              <label>Время рождения:</label>
-              <input v-model="registrationForm.birthTime" type="time" required>
-            </div>
-            <div class="modal-actions">
-              <button @click="completeRegistration" class="save-btn">Сохранить</button>
+            <h3>Редактировать состояние</h3>
+            <textarea 
+              v-model="editingEmotion.state" 
+              placeholder="Сегодня я чувствую..."
+              @focus="handleTextareaFocus"
+              @blur="handleTextareaBlur"
+            ></textarea>
+            <div class="modal-actions" :class="{ 'keyboard-open': isKeyboardOpen }">
+              <button @click="saveEditedEmotion" class="save-btn">Сохранить</button>
+              <button @click="showEditModal = false" class="cancel-btn">Отмена</button>
             </div>
           </div>
         </div>
@@ -165,10 +158,11 @@ export default {
   data() {
     return {
       loading: true,
-      showModal: false,
+      showAddModal: false,
+      showEditModal: false,
       showRequestModal: false,
-      showRegistrationForm: false,
       newEmotion: '',
+      editingEmotion: null,
       isKeyboardOpen: false,
       requests: [
         'Любовь',
@@ -178,12 +172,6 @@ export default {
         'Саморазвитие',
         'Отношения'
       ],
-      registrationForm: {
-        firstName: '',
-        lastName: '',
-        birthDate: '',
-        birthTime: ''
-      },
       user: {
         id: null,
         fullName: 'Гость',
@@ -192,9 +180,6 @@ export default {
         request: 'любовь',
         forecast: '',
         emotions: [],
-        birthDate: null,
-        birthTime: null,
-        registrationDate: null
       }
     }
   },
@@ -216,19 +201,12 @@ export default {
   },
   mounted() {
     this.initializeApp()
-    window.addEventListener('resize', this.handleResize)
-    window.addEventListener('orientationchange', this.handleResize)
-  },
-  beforeDestroy() {
-    window.removeEventListener('resize', this.handleResize)
-    window.removeEventListener('orientationchange', this.handleResize)
   },
   methods: {
     async initializeApp() {
       try {
         await this.initTelegramUser()
         this.loadUserData()
-        this.checkRegistration()
       } catch (error) {
         console.error('Ошибка инициализации:', error)
         this.setupFallbackUser()
@@ -261,91 +239,19 @@ export default {
     },
 
     deleteEmotion(index) {
-      // Удаляем эмоцию по индексу
       this.user.emotions.splice(this.user.emotions.length - 1 - index, 1)
-      // Обновляем нумерацию дней
-      this.user.emotions.forEach((emotion, i) => {
-        emotion.day = i + 1
-      })
       this.saveUserData()
     },
 
-    generateUserId() {
-      return 'user_' + Math.random().toString(36).substr(2, 9)
+    openEditModal(index) {
+      this.editingEmotion = { ...this.user.emotions[this.user.emotions.length - 1 - index], index }
+      this.showEditModal = true
     },
 
-    checkRegistration() {
-      if (!localStorage.getItem(this.user.id)) {
-        this.showRegistrationForm = true
-      }
-    },
-
-    completeRegistration() {
-      if (this.validateRegistrationForm()) {
-        this.user = {
-          ...this.user,
-          fullName: `${this.registrationForm.firstName} ${this.registrationForm.lastName}`.trim(),
-          birthDate: this.registrationForm.birthDate,
-          birthTime: this.registrationForm.birthTime,
-          registrationDate: new Date().toISOString()
-        }
-        this.saveUserData()
-        this.showRegistrationForm = false
-        if (window.Telegram?.WebApp) {
-          window.Telegram.WebApp.close()
-        }
-      }
-    },
-
-    handleResize() {
-      if (window.visualViewport) {
-        document.documentElement.style.height = `${window.visualViewport.height}px`
-        window.scrollTo(0, 0)
-      }
-    },
-
-    generateAvatar(name) {
-      const canvas = document.createElement('canvas')
-      canvas.width = 100
-      canvas.height = 100
-      const ctx = canvas.getContext('2d')
-      ctx.fillStyle = '#B566FF'
-      ctx.beginPath()
-      ctx.arc(50, 50, 50, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.fillStyle = 'white'
-      ctx.font = '40px Arial'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillText((name?.[0] || 'U').toUpperCase(), 50, 50)
-      return canvas.toDataURL()
-    },
-
-    setupFallbackUser() {
-      this.user = {
-        ...this.user,
-        fullName: 'Тестовый Пользователь',
-        avatar: this.generateAvatar('Т')
-      }
-    },
-
-    loadUserData() {
-      const savedData = localStorage.getItem(this.user.id)
-      if (savedData) {
-        try {
-          this.user = JSON.parse(savedData)
-          this.updatePlatformDays()
-        } catch (e) {
-          console.error('Ошибка загрузки данных:', e)
-        }
-      }
-    },
-
-    updatePlatformDays() {
-      if (!this.user.registrationDate) return
-      const diff = Date.now() - new Date(this.user.registrationDate).getTime()
-      this.user.daysOnPlatform = Math.floor(diff / (1000 * 3600 * 24)) + 1
+    saveEditedEmotion() {
+      this.user.emotions[this.editingEmotion.index].state = this.editingEmotion.state
       this.saveUserData()
+      this.showEditModal = false
     },
 
     addEmotion() {
@@ -356,7 +262,7 @@ export default {
           date: new Date().toISOString()
         })
         this.saveUserData()
-        this.showModal = false
+        this.showAddModal = false
         this.newEmotion = ''
       }
     },
@@ -365,14 +271,6 @@ export default {
       this.user.request = request.toLowerCase()
       this.saveUserData()
       this.showRequestModal = false
-    },
-
-    validateRegistrationForm() {
-      return (
-        this.registrationForm.firstName.trim() &&
-        this.registrationForm.lastName.trim() &&
-        this.registrationForm.birthDate
-      )
     },
 
     saveUserData() {
@@ -392,8 +290,8 @@ export default {
   }
 }
 </script>
-
 <style>
+
 
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
@@ -570,7 +468,11 @@ html, body {
 
 .main-title {
   text-align: center;
-  color: #fff;
+  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  background-clip: text;
+  color: transparent;
   font-size: 1.8rem;
   margin-bottom: 1rem;
 }
@@ -649,7 +551,11 @@ html, body {
 }
 
 .section-title {
-  color: #fff;
+  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
+  background-clip: text;
+  color: transparent;
   font-size: 1.5rem;
   margin-bottom: 1rem;
 }
@@ -679,6 +585,7 @@ html, body {
 }
 
 .emotions-header {
+  text-align: center;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -699,6 +606,7 @@ html, body {
 }
 
 .emotions-table {
+  text-align: center;
   background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
@@ -732,6 +640,21 @@ html, body {
   width: 30px; /* Уменьшенная ширина */
   text-align: right;
 }
+
+.edit-btn {
+  background-color: transparent;
+  border: none;
+  color: #ffcc26;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0 8px;
+  transition: color 0.3s ease;
+}
+
+.edit-btn:hover {
+  color: #ff3bff;
+}
+
 
 .delete-btn {
   background: none;
