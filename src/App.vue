@@ -394,6 +394,7 @@ export default {
 </script>
 
 <style>
+
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 * {
@@ -580,7 +581,7 @@ html, body {
 }
 
 .profile-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem; /* Уменьшен отступ */
 }
 
 .accent {
@@ -665,7 +666,7 @@ html, body {
 }
 
 .forecast-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem; /* Уменьшен отступ */
 }
 
 .section-title {
@@ -697,7 +698,8 @@ html, body {
 }
 
 .emotions-section {
-  margin-bottom: 2rem;
+  margin-bottom: 1rem; /* Уменьшен отступ */
+  margin-top: -20px; /* Поднимаем таблицу выше */
 }
 
 .emotions-header {
