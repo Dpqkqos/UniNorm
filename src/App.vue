@@ -311,7 +311,6 @@ html, body {
   background: #fff;
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
-  overflow: hidden;
 }
 
 @keyframes gradient {
