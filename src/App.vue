@@ -429,7 +429,7 @@ html, body {
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
-  overflow-y: auto;
+  overflow-y: auto; /* Разрешаем прокрутку внутри контейнера */
   scroll-behavior: smooth;
 }
 
@@ -723,13 +723,13 @@ html, body {
 .emotions-table {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff); /* Градиентный фон */
-  background-size: 400% 400%; /* Размер фона для анимации */
-  animation: gradient 15s ease infinite; /* Анимация градиента */
+  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
+  background-size: 400% 400%;
+  animation: gradient 15s ease infinite;
   overflow: hidden;
   border-radius: 10px;
   padding: 10px;
-  color: #fff; /* Белый текст для контраста */
+  margin-bottom: 20px; /* Добавлен отступ снизу */
 }
 
 .table-header, .emotion-row {
