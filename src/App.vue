@@ -408,7 +408,7 @@ html, body {
   line-height: 1.6;
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
-  background: #fff
+  background: #fff;
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
   overflow: hidden;
@@ -430,18 +430,16 @@ html, body {
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
   overflow-y: auto;
-  height: 100vh;
   scroll-behavior: smooth;
 }
 
-/* Модальное окно */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5); /* Затемнение без размытия */
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -461,7 +459,7 @@ html, body {
   max-width: 400px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  color: #fff; /* Белый текст для контраста */
+  color: #fff;
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -491,7 +489,7 @@ html, body {
 .modal-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: auto; /* Кнопки будут прижаты к низу */
+  margin-top: auto;
 }
 
 .save-btn, .cancel-btn {
@@ -535,7 +533,6 @@ html, body {
   }
 }
 
-/* Анимации */
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -576,14 +573,12 @@ html, body {
   transition: transform 0.4s ease;
 }
 
-/* Загрузчик */
 .loader {
   color: #fff;
   font-size: 1.5rem;
   text-align: center;
 }
 
-/* Профиль */
 .profile-section {
   margin-bottom: 2rem;
 }
@@ -611,7 +606,7 @@ html, body {
   animation: gradient 15s ease infinite;
   overflow: hidden;
   border-radius: 10px;
-  position: relative; /* Для позиционирования кнопки */
+  position: relative;
 }
 
 .user-avatar {
@@ -651,7 +646,6 @@ html, body {
   color: #ffcc26;
 }
 
-/* Кнопка "Изменить запрос" */
 .change-request-button {
   width: 100%;
   padding: 12px 24px;
@@ -663,14 +657,13 @@ html, body {
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   transition: background 0.3s ease;
-  margin-top: 15px; /* Отступ сверху */
+  margin-top: 15px;
 }
 
 .change-request-button:hover {
   background: #e62ee6;
 }
 
-/* Прогноз */
 .forecast-section {
   margin-bottom: 2rem;
 }
@@ -689,7 +682,6 @@ html, body {
   animation: gradient 15s ease infinite;
   overflow: hidden;
   padding: 15px;
-  background: rgba(255, 255, 255, 0.2);
   border-radius: 10px;
   color: #fff;
 }
@@ -704,7 +696,6 @@ html, body {
   font-size: 1.5rem;
 }
 
-/* Эмоции */
 .emotions-section {
   margin-bottom: 2rem;
 }
@@ -774,7 +765,6 @@ html, body {
   padding: 0 8px;
 }
 
-/* Форма регистрации */
 .input-group {
   display: flex;
   flex-direction: column;
@@ -799,7 +789,6 @@ html, body {
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* Кнопки выбора запроса */
 .requests-list {
   display: flex;
   flex-wrap: wrap;
