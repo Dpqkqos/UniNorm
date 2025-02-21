@@ -421,11 +421,12 @@ html, body {
   100% { background-position: 0% 50%; }
 }
 
+/* Основной контейнер */
 .app-container {
   max-width: 600px;
   margin: 0 auto;
   padding: 20px;
-  min-height: 100vh;
+  min-height: 100vh; /* Используем min-height для корректной высоты */
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -434,6 +435,7 @@ html, body {
   scroll-behavior: smooth;
 }
 
+/* Модальное окно */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -448,12 +450,9 @@ html, body {
 }
 
 .modal-content {
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
-  overflow: hidden;  
   border-radius: 16px;
   padding: 20px;
   width: 90%;
@@ -519,21 +518,7 @@ html, body {
   background: rgba(255, 255, 255, 0.2);
 }
 
-@media (max-width: 600px) {
-  html, body {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-  }
-
-  .app-container {
-    padding: 15px;
-    border-radius: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-}
-
+/* Анимации */
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -574,14 +559,9 @@ html, body {
   transition: transform 0.4s ease;
 }
 
-.loader {
-  color: #fff;
-  font-size: 1.5rem;
-  text-align: center;
-}
-
+/* Профиль */
 .profile-section {
-  margin-bottom: 1rem; /* Уменьшен отступ */
+  margin-bottom: 1rem;
 }
 
 .accent {
@@ -600,12 +580,9 @@ html, body {
   align-items: center;
   gap: 15px;
   padding: 15px;
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
-  overflow: hidden;
   border-radius: 10px;
   position: relative;
 }
@@ -647,6 +624,7 @@ html, body {
   color: #ffcc26;
 }
 
+/* Кнопка "Изменить запрос" */
 .change-request-button {
   width: 100%;
   padding: 12px 24px;
@@ -665,8 +643,9 @@ html, body {
   background: #e62ee6;
 }
 
+/* Прогноз */
 .forecast-section {
-  margin-bottom: 1rem; /* Уменьшен отступ */
+  margin-bottom: 1rem;
 }
 
 .section-title {
@@ -676,12 +655,9 @@ html, body {
 }
 
 .forecast-card {
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
-  overflow: hidden;
   padding: 15px;
   border-radius: 10px;
   color: #fff;
@@ -697,9 +673,9 @@ html, body {
   font-size: 1.5rem;
 }
 
+/* Эмоции */
 .emotions-section {
-  margin-bottom: 1rem; /* Уменьшен отступ */
-  margin-top: -20px; /* Поднимаем таблицу выше */
+  margin-bottom: 1rem;
 }
 
 .emotions-header {
@@ -723,15 +699,12 @@ html, body {
 }
 
 .emotions-table {
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 15s ease infinite;
-  overflow: hidden;
   border-radius: 10px;
   padding: 10px;
-  margin-bottom: 20px; /* Добавлен отступ снизу */
+  margin: 15px 0;
 }
 
 .table-header, .emotion-row {
@@ -768,6 +741,7 @@ html, body {
   padding: 0 8px;
 }
 
+/* Форма регистрации */
 .input-group {
   display: flex;
   flex-direction: column;
@@ -792,6 +766,7 @@ html, body {
   color: rgba(255, 255, 255, 0.7);
 }
 
+/* Кнопки выбора запроса */
 .requests-list {
   display: flex;
   flex-wrap: wrap;
@@ -805,5 +780,26 @@ html, body {
   cursor: pointer;
   background: #fb0eff;
   color: white;
+}
+
+/* Адаптация для мобильных устройств */
+@media (max-width: 600px) {
+  html, body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  .app-container {
+    padding: 15px;
+    border-radius: 0;
+    height: 100% !important;
+    overflow-y: scroll;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .emotions-table {
+    margin: 10px 0;
+  }
 }
 </style>
