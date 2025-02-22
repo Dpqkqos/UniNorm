@@ -75,8 +75,11 @@
       <transition name="slide-up" appear>
         <div class="emotions-section">
           <div class="emotions-header">
-            <h2 class="section-title">Ведение эмоционального состояния<span class="accent">✦</span></h2>
-            <button @click="showAddModal = true" class="add-button">+ Добавить</button>
+            <h2 class="section-title">
+              <span class="title-line">Ведение эмоционального</span>
+              <span class="title-line">состояния<span class="accent">✦</span></span>
+            </h2>
+            <button @click="showModal = true" class="add-button">+ Добавить</button>
           </div>
 
           <div class="emotions-table">
@@ -91,12 +94,12 @@
                 v-for="(emotion, index) in reversedEmotions" 
                 :key="emotion.day" 
                 class="emotion-row"
+                @click="openActionModal(index)"
               >
                 <div class="day-col">{{ totalEmotions - index }}</div>
                 <div class="emotion-col">{{ emotion.state }}</div>
                 <div class="action-col">
-                  <button @click.stop="openEditModal(index)" class="edit-btn">✎</button>
-                  <button @click.stop="deleteEmotion(index)" class="delete-btn">×</button>
+                  <button class="edit-btn">✎</button>
                 </div>
               </div>
             </transition-group>
@@ -104,15 +107,15 @@
         </div>
       </transition>
 
-      <!-- Модальное окно добавления эмоции -->
+      <!-- Модальное окно эмоций -->
       <transition name="fade">
         <div 
-          v-if="showAddModal" 
+          v-if="showModal" 
           class="modal-overlay"
-          @click.self="showAddModal = false"
+          @click.self="showModal = false"
         >
           <div class="modal-content">
-            <h3>Опишите ваше состояние</h3>
+            <h3>{{ selectedEmotionIndex !== null ? 'Редактировать состояние' : 'Опишите ваше состояние' }}</h3>
             <textarea 
               v-model="newEmotion" 
               placeholder="Сегодня я чувствую..."
@@ -121,30 +124,55 @@
             ></textarea>
             <div class="modal-actions" :class="{ 'keyboard-open': isKeyboardOpen }">
               <button @click="addEmotion" class="save-btn">Сохранить</button>
-              <button @click="showAddModal = false" class="cancel-btn">Отмена</button>
+              <button @click="showModal = false" class="cancel-btn">Отмена</button>
             </div>
           </div>
         </div>
       </transition>
 
-      <!-- Модальное окно редактирования эмоции -->
+      <!-- Модальное окно для выбора действия -->
       <transition name="fade">
         <div 
-          v-if="showEditModal" 
+          v-if="showActionModal" 
           class="modal-overlay"
-          @click.self="showEditModal = false"
+          @click.self="showActionModal = false"
         >
           <div class="modal-content">
-            <h3>Редактировать состояние</h3>
-            <textarea 
-              v-model="editingEmotion.state" 
-              placeholder="Сегодня я чувствую..."
-              @focus="handleTextareaFocus"
-              @blur="handleTextareaBlur"
-            ></textarea>
-            <div class="modal-actions" :class="{ 'keyboard-open': isKeyboardOpen }">
-              <button @click="saveEditedEmotion" class="save-btn">Сохранить</button>
-              <button @click="showEditModal = false" class="cancel-btn">Отмена</button>
+            <h3>Выберите действие</h3>
+            <div class="action-buttons">
+              <button @click="editSelectedEmotion" class="save-btn">Редактировать</button>
+              <button @click="deleteSelectedEmotion" class="cancel-btn">Удалить</button>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Форма регистрации -->
+      <transition name="fade">
+        <div 
+          v-if="showRegistrationForm" 
+          class="modal-overlay"
+        >
+          <div class="modal-content">
+            <h3>Заполните ваши данные</h3>
+            <div class="input-group">
+              <label>Имя:</label>
+              <input v-model="registrationForm.firstName" type="text" required>
+            </div>
+            <div class="input-group">
+              <label>Фамилия:</label>
+              <input v-model="registrationForm.lastName" type="text" required>
+            </div>
+            <div class="input-group">
+              <label>Дата рождения:</label>
+              <input v-model="registrationForm.birthDate" type="date" required>
+            </div>
+            <div class="input-group">
+              <label>Время рождения:</label>
+              <input v-model="registrationForm.birthTime" type="time" required>
+            </div>
+            <div class="modal-actions">
+              <button @click="completeRegistration" class="save-btn">Сохранить</button>
             </div>
           </div>
         </div>
@@ -152,18 +180,18 @@
     </template>
   </div>
 </template>
-
 <script>
 export default {
   data() {
     return {
       loading: true,
-      showAddModal: false,
-      showEditModal: false,
+      showModal: false,
       showRequestModal: false,
+      showRegistrationForm: false,
+      showActionModal: false,
       newEmotion: '',
-      editingEmotion: null,
       isKeyboardOpen: false,
+      selectedEmotionIndex: null,
       requests: [
         'Любовь',
         'Карьера',
@@ -172,6 +200,12 @@ export default {
         'Саморазвитие',
         'Отношения'
       ],
+      registrationForm: {
+        firstName: '',
+        lastName: '',
+        birthDate: '',
+        birthTime: ''
+      },
       user: {
         id: null,
         fullName: 'Гость',
@@ -180,6 +214,9 @@ export default {
         request: 'любовь',
         forecast: '',
         emotions: [],
+        birthDate: null,
+        birthTime: null,
+        registrationDate: null
       }
     }
   },
@@ -201,12 +238,19 @@ export default {
   },
   mounted() {
     this.initializeApp()
+    window.addEventListener('resize', this.handleResize)
+    window.addEventListener('orientationchange', this.handleResize)
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('orientationchange', this.handleResize)
   },
   methods: {
     async initializeApp() {
       try {
         await this.initTelegramUser()
         this.loadUserData()
+        this.checkRegistration()
       } catch (error) {
         console.error('Ошибка инициализации:', error)
         this.setupFallbackUser()
@@ -238,39 +282,147 @@ export default {
       })
     },
 
+    openActionModal(index) {
+      this.selectedEmotionIndex = index
+      this.showActionModal = true
+    },
+
+    editSelectedEmotion() {
+      this.showActionModal = false
+      this.showModal = true
+      this.newEmotion = this.user.emotions[this.selectedEmotionIndex].state
+    },
+
+    deleteSelectedEmotion() {
+      this.deleteEmotion(this.selectedEmotionIndex)
+      this.showActionModal = false
+      this.selectedEmotionIndex = null
+    },
+
     deleteEmotion(index) {
       this.user.emotions.splice(this.user.emotions.length - 1 - index, 1)
+      this.user.emotions.forEach((emotion, i) => {
+        emotion.day = i + 1
+      })
       this.saveUserData()
     },
 
-    openEditModal(index) {
-      this.editingEmotion = { ...this.user.emotions[this.user.emotions.length - 1 - index], index }
-      this.showEditModal = true
+    generateUserId() {
+      return 'user_' + Math.random().toString(36).substr(2, 9)
     },
 
-    saveEditedEmotion() {
-      this.user.emotions[this.editingEmotion.index].state = this.editingEmotion.state
+    checkRegistration() {
+      if (!localStorage.getItem(this.user.id)) {
+        this.showRegistrationForm = true
+      }
+    },
+
+    completeRegistration() {
+      if (this.validateRegistrationForm()) {
+        this.user = {
+          ...this.user,
+          fullName: `${this.registrationForm.firstName} ${this.registrationForm.lastName}`.trim(),
+          birthDate: this.registrationForm.birthDate,
+          birthTime: this.registrationForm.birthTime,
+          registrationDate: new Date().toISOString()
+        }
+        this.saveUserData()
+        this.showRegistrationForm = false
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.close()
+        }
+      }
+    },
+
+    handleResize() {
+      if (window.visualViewport) {
+        document.documentElement.style.height = `${window.visualViewport.height}px`
+        window.scrollTo(0, 0)
+      }
+    },
+
+    generateAvatar(name) {
+      const canvas = document.createElement('canvas')
+      canvas.width = 100
+      canvas.height = 100
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = '#B566FF'
+      ctx.beginPath()
+      ctx.arc(50, 50, 50, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = 'white'
+      ctx.font = '40px Arial'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText((name?.[0] || 'U').toUpperCase(), 50, 50)
+      return canvas.toDataURL()
+    },
+
+    setupFallbackUser() {
+      this.user = {
+        ...this.user,
+        fullName: 'Тестовый Пользователь',
+        avatar: this.generateAvatar('Т')
+      }
+    },
+
+    loadUserData() {
+      const savedData = localStorage.getItem(this.user.id)
+      if (savedData) {
+        try {
+          this.user = JSON.parse(savedData)
+          this.updatePlatformDays()
+        } catch (e) {
+          console.error('Ошибка загрузки данных:', e)
+        }
+      }
+    },
+
+    updatePlatformDays() {
+      if (!this.user.registrationDate) return
+      const diff = Date.now() - new Date(this.user.registrationDate).getTime()
+      this.user.daysOnPlatform = Math.floor(diff / (1000 * 3600 * 24)) + 1
       this.saveUserData()
-      this.showEditModal = false
     },
 
     addEmotion() {
       if (this.newEmotion.trim()) {
-        this.user.emotions.push({
-          day: this.user.emotions.length + 1,
-          state: this.newEmotion,
-          date: new Date().toISOString()
-        })
+        if (this.selectedEmotionIndex !== null) {
+          // Редактирование существующей эмоции
+          this.user.emotions[this.selectedEmotionIndex].state = this.newEmotion
+        } else {
+          // Добавление новой эмоции
+          this.user.emotions.push({
+            day: this.user.emotions.length + 1,
+            state: this.newEmotion,
+            date: new Date().toISOString()
+          })
+        }
         this.saveUserData()
-        this.showAddModal = false
+        this.showModal = false
         this.newEmotion = ''
+        this.selectedEmotionIndex = null
       }
+    },
+
+    openAddModal() {
+      this.newEmotion = ''; // Очищаем поле
+      this.selectedEmotionIndex = null; // Сбрасываем индекс
+      this.showModal = true;
     },
 
     selectRequest(request) {
       this.user.request = request.toLowerCase()
       this.saveUserData()
       this.showRequestModal = false
+    },
+
+    validateRegistrationForm() {
+      return (
+        this.registrationForm.firstName.trim() &&
+        this.registrationForm.lastName.trim() &&
+        this.registrationForm.birthDate
+      )
     },
 
     saveUserData() {
@@ -290,10 +442,7 @@ export default {
   }
 }
 </script>
-
 <style>
-
-
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 * {
@@ -306,20 +455,11 @@ html, body {
   height: 100%;
   font-family: 'Montserrat', sans-serif;
   line-height: 1.6;
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
   background: #fff;
   background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
+  overflow: hidden;
 }
 
-@keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-/* Основной контейнер */
 .app-container {
   max-width: 600px;
   margin: 0 auto;
@@ -330,6 +470,7 @@ html, body {
   -webkit-backdrop-filter: blur(20px);
   border-radius: 16px;
   overflow-y: auto;
+  height: 100vh;
   scroll-behavior: smooth;
 }
 
@@ -340,7 +481,7 @@ html, body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.5); /* Затемнение без размытия */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -348,16 +489,18 @@ html, body {
 }
 
 .modal-content {
-  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
+  background-size: 400% 400%; /* Добавлено для анимации */
+  animation: gradient 4s ease infinite;
   border-radius: 16px;
   padding: 20px;
   width: 90%;
   max-width: 400px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  color: #fff;
+  color: #fff; /* Белый текст для контраста */
   display: flex;
   flex-direction: column;
   gap: 15px;
@@ -387,7 +530,7 @@ html, body {
 .modal-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: auto;
+  margin-top: auto; /* Кнопки будут прижаты к низу */
 }
 
 .save-btn, .cancel-btn {
@@ -416,7 +559,28 @@ html, body {
   background: rgba(255, 255, 255, 0.2);
 }
 
+@media (max-width: 600px) {
+  html, body {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+  }
+
+  .app-container {
+    padding: 15px;
+    border-radius: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
 /* Анимации */
+@keyframes gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -457,9 +621,16 @@ html, body {
   transition: transform 0.4s ease;
 }
 
+/* Загрузчик */
+.loader {
+  color: #fff;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
 /* Профиль */
 .profile-section {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .accent {
@@ -468,11 +639,7 @@ html, body {
 
 .main-title {
   text-align: center;
-  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
-  background-clip: text;
-  color: transparent;
+  color: #000;
   font-size: 1.8rem;
   margin-bottom: 1rem;
 }
@@ -482,11 +649,13 @@ html, body {
   align-items: center;
   gap: 15px;
   padding: 15px;
-  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
+  background-size: 400% 400%; /* Добавлено для анимации */
+  animation: gradient 4s ease infinite;
   border-radius: 10px;
-  position: relative;
+  position: relative; /* Для позиционирования кнопки */
 }
 
 .user-avatar {
@@ -538,7 +707,7 @@ html, body {
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   transition: background 0.3s ease;
-  margin-top: 15px;
+  margin-top: 15px; /* Отступ сверху */
 }
 
 .change-request-button:hover {
@@ -547,24 +716,22 @@ html, body {
 
 /* Прогноз */
 .forecast-section {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .section-title {
-  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
-  background-clip: text;
-  color: transparent;
+  color: #000;
   font-size: 1.5rem;
   margin-bottom: 1rem;
 }
 
 .forecast-card {
-  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
   padding: 15px;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
+  background-size: 400% 400%; /* Добавлено для анимации */
+  animation: gradient 4s ease infinite;
   border-radius: 10px;
   color: #fff;
 }
@@ -581,11 +748,10 @@ html, body {
 
 /* Эмоции */
 .emotions-section {
-  margin-bottom: 1rem;
+  margin-bottom: 2rem;
 }
 
 .emotions-header {
-  text-align: center;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -606,20 +772,20 @@ html, body {
 }
 
 .emotions-table {
-  text-align: center;
-  background: linear-gradient(45deg, #2caadb, #872cdb, #6c11ff);
-  background-size: 400% 400%;
-  animation: gradient 15s ease infinite;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
+  background-size: 400% 400%; /* Добавлено для анимации */
+  animation: gradient 4s ease infinite;
   border-radius: 10px;
   padding: 10px;
-  margin: 15px 0;
-  font-size: 0.9rem; /* Уменьшенный шрифт */
 }
 
 .table-header, .emotion-row {
+  text-align: center;
   display: flex;
   justify-content: space-between;
-  padding: 6px 0; /* Уменьшенные отступы */
+  padding: 8px 0;
   color: #fff;
 }
 
@@ -630,39 +796,67 @@ html, body {
 
 .day-col {
   flex: 1;
+  min-width: 50px; /* Минимальная ширина для колонки "День" */
 }
 
 .emotion-col {
   flex: 3;
+  min-width: 150px; /* Минимальная ширина для колонки "Эмоциональное состояние" */
 }
 
 .action-col {
-  width: 30px; /* Уменьшенная ширина */
-  text-align: right;
+  display: flex;
+  justify-content: flex-end;
+  width: 80px; /* Фиксированная ширина для колонки с кнопками */
+  gap: 8px; /* Расстояние между кнопками */
 }
 
+.delete-btn {
+  display: none;
+}
 .edit-btn {
-  background-color: transparent;
+  background: none;
   border: none;
   color: #ffcc26;
   font-size: 1.2rem;
   cursor: pointer;
-  padding: 0 8px;
-  transition: color 0.3s ease;
+  padding: 0;
 }
 
-.edit-btn:hover {
-  color: #ff3bff;
+.action-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
 }
 
+/* Заголовок "Ведение эмоционального состояния" */
+.emotions-header .section-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-.delete-btn {
-  background: none;
-  border: none;
-  color: #ff3b3b;
-  font-size: 1.2rem; /* Уменьшенный размер иконки */
-  cursor: pointer;
-  padding: 0 4px; /* Уменьшенные отступы */
+.emotions-header .section-title .title-line {
+  display: inline-block;
+}
+
+.emotions-header .section-title .accent {
+  margin-left: 4px; /* Отступ для значка */
+}
+
+@media (max-width: 600px) {
+  .emotions-header .section-title {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .emotions-header .section-title .title-line {
+    display: inline;
+  }
+
+  .emotions-header .section-title .accent {
+    margin-left: 0;
+  }
 }
 
 /* Форма регистрации */
@@ -704,31 +898,5 @@ html, body {
   cursor: pointer;
   background: #fb0eff;
   color: white;
-}
-
-/* Адаптация для мобильных устройств */
-@media (max-width: 600px) {
-  html, body {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-  }
-
-  .app-container {
-    padding: 15px;
-    border-radius: 0;
-    height: 100% !important;
-    overflow-y: scroll;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .emotions-table {
-    margin: 10px 0;
-    font-size: 0.8rem; /* Ещё меньше шрифт на мобильных */
-  }
-
-  .table-header, .emotion-row {
-    padding: 4px 0; /* Ещё меньше отступы на мобильных */
-  }
 }
 </style>
