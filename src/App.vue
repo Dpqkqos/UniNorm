@@ -79,7 +79,7 @@
               <span class="title-line">Ведение эмоционального</span>
               <span class="title-line">состояния<span class="accent">✦</span></span>
             </h2>
-            <button @click="showModal = true" class="add-button">+ Добавить</button>
+            <button @click="openAddModal" class="add-button">+ Добавить</button>
           </div>
 
           <div class="emotions-table">
@@ -234,6 +234,11 @@ export default {
       if (last === 1) return 'день'
       if (last > 1 && last < 5) return 'дня'
       return 'дней'
+    },
+    modalOverlayHeight() {
+      const baseHeight = window.innerWidth <= 600 ? 110 : 100;
+      const additionalHeight = this.totalEmotions * 5;
+      return `${baseHeight + additionalHeight}%`;
     }
   },
   mounted() {
@@ -285,12 +290,14 @@ export default {
     openActionModal(index) {
       this.selectedEmotionIndex = index
       this.showActionModal = true
+      this.setModalOverlayHeight()
     },
 
     editSelectedEmotion() {
       this.showActionModal = false
       this.showModal = true
       this.newEmotion = this.user.emotions[this.selectedEmotionIndex].state
+      this.setModalOverlayHeight()
     },
 
     deleteSelectedEmotion() {
@@ -316,7 +323,7 @@ export default {
         this.showRegistrationForm = true
       }
     },
-
+    
     completeRegistration() {
       if (this.validateRegistrationForm()) {
         this.user = {
@@ -409,6 +416,14 @@ export default {
       this.newEmotion = ''; // Очищаем поле
       this.selectedEmotionIndex = null; // Сбрасываем индекс
       this.showModal = true;
+      this.setModalOverlayHeight();
+    },
+
+    setModalOverlayHeight() {
+      const overlay = document.querySelector('.modal-overlay');
+      if (overlay) {
+        overlay.style.height = this.modalOverlayHeight;
+      }
     },
 
     selectRequest(request) {
@@ -442,6 +457,7 @@ export default {
   }
 }
 </script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
@@ -457,7 +473,7 @@ html, body {
   line-height: 1.6;
   background: #fff;
   background-size: 400% 400%;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .app-container {
@@ -474,25 +490,28 @@ html, body {
   scroll-behavior: smooth;
 }
 
-/* Модальное окно */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5); /* Затемнение без размытия */
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  overflow-y: auto;
+  padding: 20px;
+  height: v-bind('modalOverlayHeight');
+  transition: height 0.3s ease;
 }
 
 .modal-content {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
-  background-size: 400% 400%; /* Добавлено для анимации */
+  background-size: 400% 400%;
   animation: gradient 4s ease infinite;
   border-radius: 16px;
   padding: 20px;
@@ -500,10 +519,11 @@ html, body {
   max-width: 400px;
   border: 1px solid rgba(255, 255, 255, 0.2);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  color: #fff; /* Белый текст для контраста */
+  color: #fff;
   display: flex;
   flex-direction: column;
   gap: 15px;
+  margin: auto;
 }
 
 .modal-content h3 {
@@ -530,7 +550,7 @@ html, body {
 .modal-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: auto; /* Кнопки будут прижаты к низу */
+  margin-top: auto;
 }
 
 .save-btn, .cancel-btn {
@@ -574,7 +594,6 @@ html, body {
   }
 }
 
-/* Анимации */
 @keyframes gradient {
   0% { background-position: 0% 50%; }
   50% { background-position: 100% 50%; }
@@ -621,14 +640,12 @@ html, body {
   transition: transform 0.4s ease;
 }
 
-/* Загрузчик */
 .loader {
   color: #fff;
   font-size: 1.5rem;
   text-align: center;
 }
 
-/* Профиль */
 .profile-section {
   margin-bottom: 2rem;
 }
@@ -652,10 +669,10 @@ html, body {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
-  background-size: 400% 400%; /* Добавлено для анимации */
+  background-size: 400% 400%;
   animation: gradient 4s ease infinite;
   border-radius: 10px;
-  position: relative; /* Для позиционирования кнопки */
+  position: relative;
 }
 
 .user-avatar {
@@ -695,7 +712,6 @@ html, body {
   color: #ffcc26;
 }
 
-/* Кнопка "Изменить запрос" */
 .change-request-button {
   width: 100%;
   padding: 12px 24px;
@@ -707,14 +723,13 @@ html, body {
   cursor: pointer;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   transition: background 0.3s ease;
-  margin-top: 15px; /* Отступ сверху */
+  margin-top: 15px;
 }
 
 .change-request-button:hover {
   background: #e62ee6;
 }
 
-/* Прогноз */
 .forecast-section {
   margin-bottom: 2rem;
 }
@@ -730,7 +745,7 @@ html, body {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
-  background-size: 400% 400%; /* Добавлено для анимации */
+  background-size: 400% 400%;
   animation: gradient 4s ease infinite;
   border-radius: 10px;
   color: #fff;
@@ -746,7 +761,6 @@ html, body {
   font-size: 1.5rem;
 }
 
-/* Эмоции */
 .emotions-section {
   margin-bottom: 2rem;
 }
@@ -775,7 +789,7 @@ html, body {
   -webkit-text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
-  background-size: 400% 400%; /* Добавлено для анимации */
+  background-size: 400% 400%;
   animation: gradient 4s ease infinite;
   border-radius: 10px;
   padding: 10px;
@@ -796,24 +810,30 @@ html, body {
 
 .day-col {
   flex: 1;
-  min-width: 50px; /* Минимальная ширина для колонки "День" */
+  min-width: 50px;
 }
 
 .emotion-col {
   flex: 3;
-  min-width: 150px; /* Минимальная ширина для колонки "Эмоциональное состояние" */
+  min-width: 150px;
 }
 
 .action-col {
   display: flex;
   justify-content: flex-end;
-  width: 80px; /* Фиксированная ширина для колонки с кнопками */
-  gap: 8px; /* Расстояние между кнопками */
+  width: 80px;
+  gap: 8px;
 }
 
 .delete-btn {
-  display: none;
+  background: none;
+  border: none;
+  color: #ff3b3b;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
 }
+
 .edit-btn {
   background: none;
   border: none;
@@ -829,7 +849,6 @@ html, body {
   justify-content: center;
 }
 
-/* Заголовок "Ведение эмоционального состояния" */
 .emotions-header .section-title {
   display: flex;
   flex-direction: column;
@@ -841,7 +860,7 @@ html, body {
 }
 
 .emotions-header .section-title .accent {
-  margin-left: 4px; /* Отступ для значка */
+  margin-left: 4px;
 }
 
 @media (max-width: 600px) {
@@ -859,7 +878,6 @@ html, body {
   }
 }
 
-/* Форма регистрации */
 .input-group {
   display: flex;
   flex-direction: column;
@@ -884,7 +902,6 @@ html, body {
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* Кнопки выбора запроса */
 .requests-list {
   display: flex;
   flex-wrap: wrap;
