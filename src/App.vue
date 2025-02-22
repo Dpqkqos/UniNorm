@@ -468,7 +468,7 @@ export default {
 }
 
 html, body {
-  height: 100%;
+  height: 100vh;
   font-family: 'Montserrat', sans-serif;
   line-height: 1.6;
   background: #fff;
