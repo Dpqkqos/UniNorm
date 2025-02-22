@@ -236,9 +236,9 @@ export default {
       return 'дней'
     },
     modalOverlayHeight() {
-      const baseHeight = window.innerWidth <= 600 ? 110 : 100
-      const additionalHeight = this.totalEmotions * 5
-      return `${baseHeight + additionalHeight}%`
+      const baseHeight = window.innerWidth <= 600 ? 110 : 100;
+      const additionalHeight = this.totalEmotions * 5;
+      return `${baseHeight + additionalHeight}%`;
     }
   },
   mounted() {
@@ -263,6 +263,7 @@ export default {
         this.loading = false
       }
     },
+
     initTelegramUser() {
       return new Promise((resolve, reject) => {
         if (window.Telegram?.WebApp) {
@@ -285,17 +286,93 @@ export default {
         }
       })
     },
+
+    openActionModal(index) {
+      this.selectedEmotionIndex = index
+      this.showActionModal = true
+      this.setModalOverlayHeight()
+    },
+
+    editSelectedEmotion() {
+      this.showActionModal = false
+      this.showModal = true
+      this.newEmotion = this.user.emotions[this.selectedEmotionIndex].state
+      this.setModalOverlayHeight()
+    },
+
+    deleteSelectedEmotion() {
+      this.deleteEmotion(this.selectedEmotionIndex)
+      this.showActionModal = false
+      this.selectedEmotionIndex = null
+    },
+
+    deleteEmotion(index) {
+      this.user.emotions.splice(this.user.emotions.length - 1 - index, 1)
+      this.user.emotions.forEach((emotion, i) => {
+        emotion.day = i + 1
+      })
+      this.saveUserData()
+    },
+
     generateUserId() {
       return 'user_' + Math.random().toString(36).substr(2, 9)
     },
+
     checkRegistration() {
       if (!localStorage.getItem(this.user.id)) {
         this.showRegistrationForm = true
       }
     },
-    saveUserData() {
-      localStorage.setItem(this.user.id, JSON.stringify(this.user))
+    
+    completeRegistration() {
+      if (this.validateRegistrationForm()) {
+        this.user = {
+          ...this.user,
+          fullName: `${this.registrationForm.firstName} ${this.registrationForm.lastName}`.trim(),
+          birthDate: this.registrationForm.birthDate,
+          birthTime: this.registrationForm.birthTime,
+          registrationDate: new Date().toISOString()
+        }
+        this.saveUserData()
+        this.showRegistrationForm = false
+        if (window.Telegram?.WebApp) {
+          window.Telegram.WebApp.close()
+        }
+      }
     },
+
+    handleResize() {
+      if (window.visualViewport) {
+        document.documentElement.style.height = `${window.visualViewport.height}px`
+        window.scrollTo(0, 0)
+      }
+    },
+
+    generateAvatar(name) {
+      const canvas = document.createElement('canvas')
+      canvas.width = 100
+      canvas.height = 100
+      const ctx = canvas.getContext('2d')
+      ctx.fillStyle = '#B566FF'
+      ctx.beginPath()
+      ctx.arc(50, 50, 50, 0, Math.PI * 2)
+      ctx.fill()
+      ctx.fillStyle = 'white'
+      ctx.font = '40px Arial'
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText((name?.[0] || 'U').toUpperCase(), 50, 50)
+      return canvas.toDataURL()
+    },
+
+    setupFallbackUser() {
+      this.user = {
+        ...this.user,
+        fullName: 'Тестовый Пользователь',
+        avatar: this.generateAvatar('Т')
+      }
+    },
+
     loadUserData() {
       const savedData = localStorage.getItem(this.user.id)
       if (savedData) {
@@ -307,28 +384,75 @@ export default {
         }
       }
     },
+
     updatePlatformDays() {
       if (!this.user.registrationDate) return
       const diff = Date.now() - new Date(this.user.registrationDate).getTime()
       this.user.daysOnPlatform = Math.floor(diff / (1000 * 3600 * 24)) + 1
       this.saveUserData()
     },
-    handleResize() {
-      if (window.visualViewport) {
-        document.documentElement.style.height = `${window.visualViewport.height}px`
-        window.scrollTo(0, 0)
+
+    addEmotion() {
+      if (this.newEmotion.trim()) {
+        if (this.selectedEmotionIndex !== null) {
+          // Редактирование существующей эмоции
+          this.user.emotions[this.selectedEmotionIndex].state = this.newEmotion
+        } else {
+          // Добавление новой эмоции
+          this.user.emotions.push({
+            day: this.user.emotions.length + 1,
+            state: this.newEmotion,
+            date: new Date().toISOString()
+          })
+        }
+        this.saveUserData()
+        this.showModal = false
+        this.newEmotion = ''
+        this.selectedEmotionIndex = null
       }
-    }
-  },
-  watch: {
-    showRequestModal(val) {
-      document.body.classList.toggle('modal-open', val)
     },
-    showModal(val) {
-      document.body.classList.toggle('modal-open', val)
+
+    openAddModal() {
+      this.newEmotion = ''; // Очищаем поле
+      this.selectedEmotionIndex = null; // Сбрасываем индекс
+      this.showModal = true;
+      this.setModalOverlayHeight();
     },
-    showActionModal(val) {
-      document.body.classList.toggle('modal-open', val)
+
+    setModalOverlayHeight() {
+      const overlay = document.querySelector('.modal-overlay');
+      if (overlay) {
+        overlay.style.height = this.modalOverlayHeight;
+      }
+    },
+
+    selectRequest(request) {
+      this.user.request = request.toLowerCase()
+      this.saveUserData()
+      this.showRequestModal = false
+    },
+
+    validateRegistrationForm() {
+      return (
+        this.registrationForm.firstName.trim() &&
+        this.registrationForm.lastName.trim() &&
+        this.registrationForm.birthDate
+      )
+    },
+
+    saveUserData() {
+      localStorage.setItem(this.user.id, JSON.stringify(this.user))
+    },
+
+    handleTextareaFocus() {
+      this.isKeyboardOpen = true
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.expand()
+      }
+    },
+
+    handleTextareaBlur() {
+      this.isKeyboardOpen = false
     }
   }
 }
@@ -367,16 +491,21 @@ html, body {
 }
 
 .modal-overlay {
+  height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.5);
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  overflow-y: auto;
+  padding: 20px;
+  height: v-bind('modalOverlayHeight');
+  transition: height 0.3s ease;
 }
 
 .modal-content {
@@ -431,10 +560,6 @@ html, body {
   border-radius: 5px;
   cursor: pointer;
   transition: background 0.3s ease;
-}
-
-body.modal-open {
-  overflow: hidden;
 }
 
 .save-btn {
