@@ -455,6 +455,16 @@ export default {
       this.isKeyboardOpen = false
     }
   }
+  watch: {
+  showRequestModal(val) {
+    document.body.classList.toggle('modal-open', val);
+  },
+  showModal(val) {
+    document.body.classList.toggle('modal-open', val);
+  },
+  showActionModal(val) {
+    document.body.classList.toggle('modal-open', val);
+  }
 }
 </script>
 
@@ -491,21 +501,16 @@ html, body {
 }
 
 .modal-overlay {
-  height: 100vh;
   position: fixed;
   top: 0;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  overflow-y: auto;
-  padding: 20px;
-  height: v-bind('modalOverlayHeight');
-  transition: height 0.3s ease;
 }
 
 .modal-content {
@@ -560,6 +565,10 @@ html, body {
   border-radius: 5px;
   cursor: pointer;
   transition: background 0.3s ease;
+}
+
+body.modal-open {
+  overflow: hidden;
 }
 
 .save-btn {
