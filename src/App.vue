@@ -24,35 +24,29 @@
                 </div>
               </div>
               <!-- Кнопка "Изменить запрос" -->
-              <button @click="showRequestModal = true" class="change-request-button">
-                Изменить запрос
-              </button>
-            </div>
-          </div>
-        </div>
-      </transition>
-
-      <!-- Модальное окно выбора запроса -->
-      <transition name="fade">
-        <div 
-          v-if="showRequestModal" 
-          class="modal-overlay"
-          @click.self="showRequestModal = false"
-        >
-          <div class="modal-content">
-            <h3>Выберите ваш запрос</h3>
-            <div class="requests-list">
-              <button
-                v-for="(request, index) in requests"
-                :key="index"
-                @click="selectRequest(request)"
-                class="request-item"
-              >
-                {{ request }}
-              </button>
-            </div>
-            <div class="modal-actions">
-              <button @click="showRequestModal = false" class="cancel-btn">Закрыть</button>
+              <div class="button-container">
+                <button 
+                  @click="toggleRequestWindow" 
+                  :class="{ 'expanded': showRequestModal }" 
+                  class="change-request-button"
+                >
+                  {{ showRequestModal ? 'Закрыть' : 'Изменить запрос' }}
+                </button>
+                <transition name="expand">
+                  <div v-if="showRequestModal" class="request-window">
+                    <div class="requests-list">
+                      <button
+                        v-for="(request, index) in requests"
+                        :key="index"
+                        @click="selectRequest(request)"
+                        class="request-item"
+                      >
+                        {{ request }}
+                      </button>
+                    </div>
+                  </div>
+                </transition>
+              </div>
             </div>
           </div>
         </div>
@@ -79,7 +73,26 @@
               <span class="title-line">Ведение эмоционального</span>
               <span class="title-line">состояния<span class="accent">✦</span></span>
             </h2>
-            <button @click="openAddModal" class="add-button">+ Добавить</button>
+            <!-- Кнопка "Добавить эмоцию" -->
+            <div class="button-container">
+              <button 
+                @click="toggleEmotionWindow" 
+                :class="{ 'expanded': showEmotionModal }" 
+                class="add-button"
+              >
+                {{ showEmotionModal ? 'Закрыть' : '+ Добавить' }}
+              </button>
+              <transition name="expand">
+                <div v-if="showEmotionModal" class="emotion-window">
+                  <textarea 
+                    v-model="newEmotion" 
+                    placeholder="Сегодня я чувствую..."
+                    class="styled-textarea"
+                  ></textarea>
+                  <button @click="addEmotion" class="save-btn">Сохранить</button>
+                </div>
+              </transition>
+            </div>
           </div>
 
           <div class="emotions-table">
@@ -94,12 +107,22 @@
                 v-for="(emotion, index) in reversedEmotions" 
                 :key="emotion.day" 
                 class="emotion-row"
-                @click="openActionModal(index)"
               >
                 <div class="day-col">{{ totalEmotions - index }}</div>
                 <div class="emotion-col">{{ emotion.state }}</div>
                 <div class="action-col">
-                  <button class="edit-btn">✎</button>
+                  <button 
+                    class="edit-btn" 
+                    @click="openEditModal(index)"
+                  >
+                    ✎
+                  </button>
+                  <button 
+                    class="delete-btn" 
+                    @click="openDeleteModal(index)"
+                  >
+                    🗑️
+                  </button>
                 </div>
               </div>
             </transition-group>
@@ -107,72 +130,39 @@
         </div>
       </transition>
 
-      <!-- Модальное окно эмоций -->
+      <!-- Модальное окно редактирования -->
       <transition name="fade">
         <div 
-          v-if="showModal" 
+          v-if="showEditModal" 
           class="modal-overlay"
-          @click.self="showModal = false"
+          @click.self="showEditModal = false"
         >
-          <div class="modal-content">
-            <h3>{{ selectedEmotionIndex !== null ? 'Редактировать состояние' : 'Опишите ваше состояние' }}</h3>
+          <div class="modal-content styled-modal">
+            <h3>Редактировать состояние</h3>
             <textarea 
-              v-model="newEmotion" 
+              v-model="editEmotionText" 
               placeholder="Сегодня я чувствую..."
-              @focus="handleTextareaFocus"
-              @blur="handleTextareaBlur"
             ></textarea>
-            <div class="modal-actions" :class="{ 'keyboard-open': isKeyboardOpen }">
-              <button @click="addEmotion" class="save-btn">Сохранить</button>
-              <button @click="showModal = false" class="cancel-btn">Отмена</button>
-            </div>
-          </div>
-        </div>
-      </transition>
-
-      <!-- Модальное окно для выбора действия -->
-      <transition name="fade">
-        <div 
-          v-if="showActionModal" 
-          class="modal-overlay"
-          @click.self="showActionModal = false"
-        >
-          <div class="modal-content">
-            <h3>Выберите действие</h3>
-            <div class="action-buttons">
-              <button @click="editSelectedEmotion" class="save-btn">Редактировать</button>
-              <button @click="deleteSelectedEmotion" class="cancel-btn">Удалить</button>
-            </div>
-          </div>
-        </div>
-      </transition>
-
-      <!-- Форма регистрации -->
-      <transition name="fade">
-        <div 
-          v-if="showRegistrationForm" 
-          class="modal-overlay"
-        >
-          <div class="modal-content">
-            <h3>Заполните ваши данные</h3>
-            <div class="input-group">
-              <label>Имя:</label>
-              <input v-model="registrationForm.firstName" type="text" required>
-            </div>
-            <div class="input-group">
-              <label>Фамилия:</label>
-              <input v-model="registrationForm.lastName" type="text" required>
-            </div>
-            <div class="input-group">
-              <label>Дата рождения:</label>
-              <input v-model="registrationForm.birthDate" type="date" required>
-            </div>
-            <div class="input-group">
-              <label>Время рождения:</label>
-              <input v-model="registrationForm.birthTime" type="time" required>
-            </div>
             <div class="modal-actions">
-              <button @click="completeRegistration" class="save-btn">Сохранить</button>
+              <button @click="saveEditedEmotion" class="styled-button">Сохранить</button>
+              <button @click="showEditModal = false" class="styled-button">Отмена</button>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Модальное окно подтверждения удаления -->
+      <transition name="fade">
+        <div 
+          v-if="showDeleteModal" 
+          class="modal-overlay"
+          @click.self="showDeleteModal = false"
+        >
+          <div class="modal-content styled-modal">
+            <h3>Вы уверены, что хотите удалить запись?</h3>
+            <div class="modal-actions">
+              <button @click="deleteEmotion" class="styled-button">Удалить</button>
+              <button @click="showDeleteModal = false" class="styled-button">Отмена</button>
             </div>
           </div>
         </div>
@@ -180,6 +170,7 @@
     </template>
   </div>
 </template>
+
 <script>
 export default {
   data() {
@@ -187,9 +178,11 @@ export default {
       loading: true,
       showModal: false,
       showRequestModal: false,
-      showRegistrationForm: false,
-      showActionModal: false,
+      showEmotionModal: false,
+      showEditModal: false,
+      showDeleteModal: false,
       newEmotion: '',
+      editEmotionText: '',
       isKeyboardOpen: false,
       selectedEmotionIndex: null,
       requests: [
@@ -200,15 +193,9 @@ export default {
         'Саморазвитие',
         'Отношения'
       ],
-      registrationForm: {
-        firstName: '',
-        lastName: '',
-        birthDate: '',
-        birthTime: ''
-      },
       user: {
         id: null,
-        fullName: 'Гость',
+        fullName: 'Тестовый пользователь',
         avatar: '',
         daysOnPlatform: 1,
         request: 'любовь',
@@ -218,22 +205,22 @@ export default {
         birthTime: null,
         registrationDate: null
       }
-    }
+    };
   },
   computed: {
     reversedEmotions() {
-      return [...this.user.emotions].reverse()
+      return [...this.user.emotions].reverse();
     },
     totalEmotions() {
-      return this.user.emotions.length
+      return this.user.emotions.length;
     },
     daysText() {
-      const days = this.user.daysOnPlatform
-      const last = days % 10
-      if (days > 10 && days < 20) return 'дней'
-      if (last === 1) return 'день'
-      if (last > 1 && last < 5) return 'дня'
-      return 'дней'
+      const days = this.user.daysOnPlatform;
+      const last = days % 10;
+      if (days > 10 && days < 20) return 'дней';
+      if (last === 1) return 'день';
+      if (last > 1 && last < 5) return 'дня';
+      return 'дней';
     },
     modalOverlayHeight() {
       const baseHeight = window.innerWidth <= 600 ? 110 : 100;
@@ -241,89 +228,141 @@ export default {
       return `${baseHeight + additionalHeight}%`;
     }
   },
+  methods: {
+    deleteEmotion(index) {
+      // Удаляем эмоцию по индексу
+      this.user.emotions.splice(index, 1);
+
+      // Обновляем номера дней для всех оставшихся записей
+      this.user.emotions.forEach((emotion, i) => {
+        emotion.day = i + 1;
+      });
+
+      // Сохраняем обновленные данные
+      this.saveUserData();
+    },
+
+    saveUserData() {
+      localStorage.setItem(this.user.id, JSON.stringify(this.user));
+    },
+
+    modalOverlayHeight() {
+      const baseHeight = window.innerWidth <= 600 ? 110 : 100;
+      const additionalHeight = this.totalEmotions * 5;
+      return `${baseHeight + additionalHeight}%`;
+    }
+  },
   mounted() {
-    this.initializeApp()
-    window.addEventListener('resize', this.handleResize)
-    window.addEventListener('orientationchange', this.handleResize)
+    this.initializeApp();
+    window.addEventListener('resize', this.handleResize);
+    window.addEventListener('orientationchange', this.handleResize);
   },
   beforeDestroy() {
-    window.removeEventListener('resize', this.handleResize)
-    window.removeEventListener('orientationchange', this.handleResize)
+    window.removeEventListener('resize', this.handleResize);
+    window.removeEventListener('orientationchange', this.handleResize);
   },
   methods: {
     async initializeApp() {
       try {
-        await this.initTelegramUser()
-        this.loadUserData()
-        this.checkRegistration()
+        await this.initTelegramUser();
+        this.loadUserData();
+        this.checkRegistration();
       } catch (error) {
-        console.error('Ошибка инициализации:', error)
-        this.setupFallbackUser()
+        console.error('Ошибка инициализации:', error);
+        this.setupFallbackUser();
       } finally {
-        this.loading = false
+        this.loading = false;
       }
     },
 
     initTelegramUser() {
       return new Promise((resolve, reject) => {
         if (window.Telegram?.WebApp) {
-          const tg = window.Telegram.WebApp
-          const user = tg.initDataUnsafe?.user
-          
+          const tg = window.Telegram.WebApp;
+          const user = tg.initDataUnsafe?.user;
+
           if (user) {
-            this.user.id = user.id || this.generateUserId()
-            this.user.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Пользователь'
-            this.user.avatar = user.photo_url || this.generateAvatar(user.first_name)
-            tg.expand()
-            tg.enableClosingConfirmation()
-            resolve()
+            this.user.id = user.id || this.generateUserId();
+            this.user.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Пользователь';
+            this.user.avatar = user.photo_url || this.generateAvatar(user.first_name);
+            tg.expand();
+            tg.enableClosingConfirmation();
+            resolve();
           } else {
-            reject('Данные пользователя Telegram не доступны')
+            reject('Данные пользователя Telegram не доступны');
           }
         } else {
-          this.user.id = this.generateUserId()
-          resolve()
+          this.user.id = this.generateUserId();
+          resolve();
         }
-      })
+      });
     },
 
-    openActionModal(index) {
-      this.selectedEmotionIndex = index
-      this.showActionModal = true
-      this.setModalOverlayHeight()
+    toggleRequestWindow() {
+      this.showRequestModal = !this.showRequestModal;
     },
 
-    editSelectedEmotion() {
-      this.showActionModal = false
-      this.showModal = true
-      this.newEmotion = this.user.emotions[this.selectedEmotionIndex].state
-      this.setModalOverlayHeight()
+    toggleEmotionWindow() {
+      this.showEmotionModal = !this.showEmotionModal;
     },
 
-    deleteSelectedEmotion() {
-      this.deleteEmotion(this.selectedEmotionIndex)
-      this.showActionModal = false
-      this.selectedEmotionIndex = null
+    openEditModal(index) {
+      this.selectedEmotionIndex = index;
+      this.editEmotionText = this.user.emotions[index].state;
+      this.showEditModal = true;
     },
 
-    deleteEmotion(index) {
-      this.user.emotions.splice(this.user.emotions.length - 1 - index, 1)
+    saveEditedEmotion() {
+      if (this.editEmotionText.trim()) {
+        this.user.emotions[this.selectedEmotionIndex].state = this.editEmotionText;
+        this.showEditModal = false;
+        this.saveUserData();
+      }
+    },
+
+    openDeleteModal(index) {
+      this.selectedEmotionIndex = index;
+      this.showDeleteModal = true;
+    },
+
+    deleteEmotion() {
+      this.user.emotions.splice(this.selectedEmotionIndex, 1);
       this.user.emotions.forEach((emotion, i) => {
-        emotion.day = i + 1
-      })
-      this.saveUserData()
+        emotion.day = i + 1;
+      });
+      this.showDeleteModal = false;
+      this.saveUserData();
+    },
+
+    addEmotion() {
+      if (this.newEmotion.trim()) {
+        this.user.emotions.push({
+          day: this.user.emotions.length + 1,
+          state: this.newEmotion,
+          date: new Date().toISOString()
+        });
+        this.newEmotion = '';
+        this.showEmotionModal = false;
+        this.saveUserData();
+      }
+    },
+
+    selectRequest(request) {
+      this.user.request = request.toLowerCase();
+      this.showRequestModal = false;
+      this.saveUserData();
     },
 
     generateUserId() {
-      return 'user_' + Math.random().toString(36).substr(2, 9)
+      return 'user_' + Math.random().toString(36).substr(2, 9);
     },
 
     checkRegistration() {
       if (!localStorage.getItem(this.user.id)) {
-        this.showRegistrationForm = true
+        this.showRegistrationForm = true;
       }
     },
-    
+
     completeRegistration() {
       if (this.validateRegistrationForm()) {
         this.user = {
@@ -332,104 +371,13 @@ export default {
           birthDate: this.registrationForm.birthDate,
           birthTime: this.registrationForm.birthTime,
           registrationDate: new Date().toISOString()
-        }
-        this.saveUserData()
-        this.showRegistrationForm = false
+        };
+        this.saveUserData();
+        this.showRegistrationForm = false;
         if (window.Telegram?.WebApp) {
-          window.Telegram.WebApp.close()
+          window.Telegram.WebApp.close();
         }
       }
-    },
-
-    handleResize() {
-      if (window.visualViewport) {
-        document.documentElement.style.height = `${window.visualViewport.height}px`
-        window.scrollTo(0, 0)
-      }
-    },
-
-    generateAvatar(name) {
-      const canvas = document.createElement('canvas')
-      canvas.width = 100
-      canvas.height = 100
-      const ctx = canvas.getContext('2d')
-      ctx.fillStyle = '#B566FF'
-      ctx.beginPath()
-      ctx.arc(50, 50, 50, 0, Math.PI * 2)
-      ctx.fill()
-      ctx.fillStyle = 'white'
-      ctx.font = '40px Arial'
-      ctx.textAlign = 'center'
-      ctx.textBaseline = 'middle'
-      ctx.fillText((name?.[0] || 'U').toUpperCase(), 50, 50)
-      return canvas.toDataURL()
-    },
-
-    setupFallbackUser() {
-      this.user = {
-        ...this.user,
-        fullName: 'Тестовый Пользователь',
-        avatar: this.generateAvatar('Т')
-      }
-    },
-
-    loadUserData() {
-      const savedData = localStorage.getItem(this.user.id)
-      if (savedData) {
-        try {
-          this.user = JSON.parse(savedData)
-          this.updatePlatformDays()
-        } catch (e) {
-          console.error('Ошибка загрузки данных:', e)
-        }
-      }
-    },
-
-    updatePlatformDays() {
-      if (!this.user.registrationDate) return
-      const diff = Date.now() - new Date(this.user.registrationDate).getTime()
-      this.user.daysOnPlatform = Math.floor(diff / (1000 * 3600 * 24)) + 1
-      this.saveUserData()
-    },
-
-    addEmotion() {
-      if (this.newEmotion.trim()) {
-        if (this.selectedEmotionIndex !== null) {
-          // Редактирование существующей эмоции
-          this.user.emotions[this.selectedEmotionIndex].state = this.newEmotion
-        } else {
-          // Добавление новой эмоции
-          this.user.emotions.push({
-            day: this.user.emotions.length + 1,
-            state: this.newEmotion,
-            date: new Date().toISOString()
-          })
-        }
-        this.saveUserData()
-        this.showModal = false
-        this.newEmotion = ''
-        this.selectedEmotionIndex = null
-      }
-    },
-
-    openAddModal() {
-      this.newEmotion = ''; // Очищаем поле
-      this.selectedEmotionIndex = null; // Сбрасываем индекс
-      this.showModal = true;
-      this.setModalOverlayHeight();
-    },
-
-    setModalOverlayHeight() {
-      const overlay = document.querySelector('.modal-overlay');
-      if (overlay) {
-        overlay.style.height = this.modalOverlayHeight;
-      }
-    },
-
-    selectRequest(request) {
-      this.user.request = request.toLowerCase()
-      this.saveUserData()
-      this.showRequestModal = false
     },
 
     validateRegistrationForm() {
@@ -437,30 +385,68 @@ export default {
         this.registrationForm.firstName.trim() &&
         this.registrationForm.lastName.trim() &&
         this.registrationForm.birthDate
-      )
+      );
     },
 
     saveUserData() {
-      localStorage.setItem(this.user.id, JSON.stringify(this.user))
+      localStorage.setItem(this.user.id, JSON.stringify(this.user));
     },
 
-    handleTextareaFocus() {
-      this.isKeyboardOpen = true
-      if (window.Telegram?.WebApp) {
-        window.Telegram.WebApp.expand()
+    handleResize() {
+      if (window.visualViewport) {
+        document.documentElement.style.height = `${window.visualViewport.height}px`;
+        window.scrollTo(0, 0);
       }
     },
 
-    handleTextareaBlur() {
-      this.isKeyboardOpen = false
+    generateAvatar(name) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 100;
+      canvas.height = 100;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#B566FF';
+      ctx.beginPath();
+      ctx.arc(50, 50, 50, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = 'white';
+      ctx.font = '40px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText((name?.[0] || 'U').toUpperCase(), 50, 50);
+      return canvas.toDataURL();
+    },
+
+    setupFallbackUser() {
+      this.user = {
+        ...this.user,
+        fullName: 'Тестовый Пользователь',
+        avatar: this.generateAvatar('Т')
+      };
+    },
+
+    loadUserData() {
+      const savedData = localStorage.getItem(this.user.id);
+      if (savedData) {
+        try {
+          this.user = JSON.parse(savedData);
+          this.updatePlatformDays();
+        } catch (e) {
+          console.error('Ошибка загрузки данных:', e);
+        }
+      }
+    },
+
+    updatePlatformDays() {
+      if (!this.user.registrationDate) return;
+      const diff = Date.now() - new Date(this.user.registrationDate).getTime();
+      this.user.daysOnPlatform = Math.floor(diff / (1000 * 3600 * 24)) + 1;
+      this.saveUserData();
     }
   }
-}
+};
 </script>
 
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -490,137 +476,138 @@ html, body {
   scroll-behavior: smooth;
 }
 
-.modal-overlay {
-  height: 100vh;
-  position: fixed;
-  top: 0;
+.button-container {
+  position: relative;
+  width: 100%;
+  margin-top: 15px;
+}
+
+.change-request-button,
+.add-button {
+  width: 100%;
+  padding: 12px 24px;
+  background: #ff0e6b;
+  border: none;
+  border-radius: 25px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.change-request-button.expanded,
+.add-button.expanded {
+  border-radius: 25px 25px 0 0;
+  box-shadow: none;
+}
+
+.request-window,
+.emotion-window {
+  position: absolute;
+  top: 100%;
   left: 0;
   right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  overflow-y: auto;
-  padding: 20px;
-  height: v-bind('modalOverlayHeight');
-  transition: height 0.3s ease;
-}
-
-.modal-content {
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
-  background-size: 400% 400%;
   animation: gradient 4s ease infinite;
-  border-radius: 16px;
-  padding: 20px;
-  width: 90%;
-  max-width: 400px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  color: #fff;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-  margin: auto;
+  border-radius: 0 0 25px 25px;
+  overflow: hidden;
+  z-index: 0;
+  transform-origin: top;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-.modal-content h3 {
-  color: #fff;
-  margin-bottom: 15px;
-  font-size: 1.3rem;
+.requests-list,
+.emotion-window {
+  padding: 15px;
 }
 
-.modal-content textarea {
-  width: 100%;
-  height: 100px;
-  padding: 12px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  margin-bottom: 15px;
-}
-
-.modal-content textarea::placeholder {
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-top: auto;
-}
-
-.save-btn, .cancel-btn {
+.request-item,
+.save-btn {
   padding: 8px 12px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  background: #fb0eff;
+  color: white;
+  text-align: center;
   transition: background 0.3s ease;
 }
 
-.save-btn {
-  background: #ff3bff;
-  color: white;
-}
-
+.request-item:hover,
 .save-btn:hover {
   background: #e62ee6;
 }
 
-.cancel-btn {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+.emotion-window textarea {
+  width: 100%;
+  height: 100px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
+  animation: gradient 4s ease infinite;
 }
 
-.cancel-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+.styled-modal {
+  width: 90%;
+  max-width: 400px;
+  padding: 20px;
+  border-radius: 8px;
+  background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
+  animation: gradient 4s ease infinite;
+  position: absolute;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
-@media (max-width: 600px) {
-  html, body {
-    position: fixed;
-    width: 100%;
-    height: 100%;
-  }
-
-  .app-container {
-    padding: 15px;
-    border-radius: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
+.styled-textarea {
+  width: 100%;
+  height: 100px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
+  animation: gradient 4s ease infinite;
 }
 
-@keyframes gradient {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+.styled-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background: #fb0eff;
+  color: white;
+  transition: background 0.3s ease;
+  margin: 5px;
 }
 
-.slide-up-enter-active,
-.slide-up-leave-active {
-  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+.styled-button:hover {
+  background: #e62ee6;
+}
+.expand-enter-active,
+.expand-leave-active {
+  transition: all 0.3s ease;
 }
 
-.slide-up-enter-from {
+.expand-enter-from,
+.expand-leave-to {
   opacity: 0;
-  transform: translateY(40px);
+  transform: scaleY(0);
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.3s ease;
+.expand-enter-to,
+.expand-leave-from {
+  opacity: 1;
+  transform: scaleY(1);
 }
 
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-
+/* Анимация списка */
 .list-enter-active,
 .list-leave-active {
   transition: all 0.4s ease;
@@ -639,6 +626,28 @@ html, body {
 
 .list-move {
   transition: transform 0.4s ease;
+}
+
+/* Анимация появления */
+.slide-up-enter-active,
+.slide-up-leave-active {
+  transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.slide-up-enter-from {
+  opacity: 0;
+  transform: translateY(40px);
+}
+
+/* Анимация fade */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 
 .loader {
@@ -713,24 +722,6 @@ html, body {
   color: #ffcc26;
 }
 
-.change-request-button {
-  width: 100%;
-  padding: 12px 24px;
-  background: #ff0e6b;
-  border: none;
-  border-radius: 25px;
-  color: #fff;
-  font-size: 1rem;
-  cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  transition: background 0.3s ease;
-  margin-top: 15px;
-}
-
-.change-request-button:hover {
-  background: #e62ee6;
-}
-
 .forecast-section {
   margin-bottom: 2rem;
 }
@@ -770,20 +761,6 @@ html, body {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.add-button {
-  padding: 8px 12px;
-  background: #ff0e6b;
-  border: none;
-  border-radius: 5px;
-  color: #fff;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.add-button:hover {
-  background: #e62ee6;
 }
 
 .emotions-table {
@@ -916,5 +893,17 @@ html, body {
   cursor: pointer;
   background: #fb0eff;
   color: white;
+}
+
+@keyframes gradient {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
 </style>
