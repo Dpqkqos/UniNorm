@@ -1,34 +1,173 @@
 <template>
-  <div v-if="loading">Загрузка...</div>
-  <div v-else>
-    <h1>Привет, {{ user.fullName }}</h1>
-    <button @click="toggleEmotionWindow">Добавить эмоцию</button>
+  <div class="app-container">
+    <!-- Загрузчик -->
+    <div v-if="loading" class="loader">Загрузка...</div>
 
-    <div v-if="showEmotionModal">
-      <input v-model="newEmotion" placeholder="Введите эмоцию" />
-      <button @click="addEmotion">Сохранить</button>
-      <button @click="toggleEmotionWindow">Отмена</button>
-    </div>
+    <!-- Основной контент -->
+    <template v-else>
+      <!-- Профиль -->
+      <transition name="slide-up" appear>
+        <div class="profile-section">
+          <h1 class="main-title">Личная карточка<span class="accent">✦</span></h1>
+          <div class="profile-card">
+            <img :src="user.avatar" class="user-avatar" alt="Аватар" />
+            <div class="user-info">
+              <h2 class="user-name">{{ user.fullName }}</h2>
+              <div class="user-stats">
+                <div class="stat-item">
+                  <span class="icon">✦</span>
+                  {{ user.daysOnPlatform }} {{ daysText }} на платформе
+                </div>
+                <div class="stat-item">
+                  <span class="icon">✦</span>
+                  Ваш запрос: {{ user.request }}
+                </div>
+              </div>
+              <!-- Кнопка "Изменить запрос" -->
+              <div class="button-container">
+                <button 
+                  @click="toggleRequestWindow" 
+                  :class="{ 'expanded': showRequestModal }" 
+                  class="change-request-button"
+                >
+                  {{ showRequestModal ? 'Закрыть' : 'Изменить запрос' }}
+                </button>
+                <transition name="expand">
+                  <div v-if="showRequestModal" class="request-window">
+                    <div class="requests-list">
+                      <button
+                        v-for="(request, index) in requests"
+                        :key="index"
+                        @click="selectRequest(request)"
+                        class="request-item"
+                      >
+                        {{ request }}
+                      </button>
+                    </div>
+                  </div>
+                </transition>
+              </div>
+            </div>
+          </div>
+        </div>
+      </transition>
 
-    <table>
-      <thead>
-        <tr>
-          <th>День</th>
-          <th>Состояние</th>
-          <th>Действия</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="(emotion, index) in reversedEmotions" :key="emotion.id">
-          <td>{{ index + 1 }}</td>
-          <td>{{ emotion.state }}</td>
-          <td>
-            <button @click="openEditModal(index)">✏️</button>
-            <button @click="deleteEmotion(emotion.id)">🗑️</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      <!-- Прогноз -->
+      <transition name="slide-up" appear>
+        <div class="forecast-section">
+          <h2 class="section-title">Прогноз на день</h2>
+          <div class="forecast-card">
+            <div class="forecast-content">
+              <span class="forecast-icon">◎</span>
+              <p>{{ user.forecast || 'Сегодня будет прекрасный день!' }}</p>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Эмоции -->
+      <transition name="slide-up" appear>
+        <div class="emotions-section">
+          <div class="emotions-header">
+            <h2 class="section-title">
+              <span class="title-line">Ведение эмоционального</span>
+              <span class="title-line">состояния<span class="accent">✦</span></span>
+            </h2>
+            <!-- Кнопка "Добавить эмоцию" -->
+            <div class="button-container">
+              <button 
+                @click="toggleEmotionWindow" 
+                :class="{ 'expanded': showEmotionModal }" 
+                class="add-button"
+              >
+                {{ showEmotionModal ? 'Закрыть' : '+ Добавить' }}
+              </button>
+              <transition name="expand">
+                <div v-if="showEmotionModal" class="emotion-window">
+                  <textarea 
+                    v-model="newEmotion" 
+                    placeholder="Сегодня я чувствую..."
+                    class="styled-textarea"
+                  ></textarea>
+                  <button @click="addEmotion" class="save-btn">Сохранить</button>
+                </div>
+              </transition>
+            </div>
+          </div>
+
+          <div class="emotions-table">
+            <div class="table-header">
+              <div class="day-col">День</div>
+              <div class="emotion-col">Эмоциональное состояние</div>
+              <div class="action-col"></div>
+            </div>
+
+            <transition-group name="list" tag="div">
+              <div 
+                v-for="(emotion, index) in reversedEmotions" 
+                :key="emotion.day" 
+                class="emotion-row"
+              >
+                <div class="day-col">{{ totalEmotions - index }}</div>
+                <div class="emotion-col">{{ emotion.state }}</div>
+                <div class="action-col">
+                  <button 
+                    class="edit-btn" 
+                    @click="openEditModal(index)"
+                  >
+                    ✎
+                  </button>
+                  <button 
+                    class="delete-btn" 
+                    @click="openDeleteModal(index)"
+                  >
+                    🗑️
+                  </button>
+                </div>
+              </div>
+            </transition-group>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Модальное окно редактирования -->
+      <transition name="fade">
+        <div 
+          v-if="showEditModal" 
+          class="modal-overlay"
+          @click.self="showEditModal = false"
+        >
+          <div class="modal-content styled-modal">
+            <h3>Редактировать состояние</h3>
+            <textarea 
+              v-model="editEmotionText" 
+              placeholder="Сегодня я чувствую..."
+            ></textarea>
+            <div class="modal-actions">
+              <button @click="saveEditedEmotion" class="styled-button">Сохранить</button>
+              <button @click="showEditModal = false" class="styled-button">Отмена</button>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Модальное окно подтверждения удаления -->
+      <transition name="fade">
+        <div 
+          v-if="showDeleteModal" 
+          class="modal-overlay"
+          @click.self="showDeleteModal = false"
+        >
+          <div class="modal-content styled-modal">
+            <h3>Вы уверены, что хотите удалить запись?</h3>
+            <div class="modal-actions">
+              <button @click="deleteEmotion" class="styled-button">Удалить</button>
+              <button @click="showDeleteModal = false" class="styled-button">Отмена</button>
+            </div>
+          </div>
+        </div>
+      </transition>
+    </template>
   </div>
 </template>
 
