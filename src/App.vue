@@ -59,7 +59,7 @@
           <div class="forecast-card">
             <div class="forecast-content">
               <span class="forecast-icon">◎</span>
-              <p>{{ user.forecast || 'Сегодня будет прекрасный день!' }}</p>
+              <p>{{ forecast || 'Сегодня будет прекрасный день!' }}</p>
             </div>
           </div>
         </div>
@@ -105,7 +105,7 @@
             <transition-group name="list" tag="div">
               <div 
                 v-for="(emotion, index) in reversedEmotions" 
-                :key="emotion.day" 
+                :key="emotion.id" 
                 class="emotion-row"
               >
                 <div class="day-col">{{ totalEmotions - index }}</div>
@@ -119,51 +119,13 @@
                   </button>
                   <button 
                     class="delete-btn" 
-                    @click="openDeleteModal(index)"
+                    @click="deleteEmotion(emotion.id)"
                   >
                     🗑️
                   </button>
                 </div>
               </div>
             </transition-group>
-          </div>
-        </div>
-      </transition>
-
-      <!-- Модальное окно редактирования -->
-      <transition name="fade">
-        <div 
-          v-if="showEditModal" 
-          class="modal-overlay"
-          @click.self="showEditModal = false"
-        >
-          <div class="modal-content styled-modal">
-            <h3>Редактировать состояние</h3>
-            <textarea 
-              v-model="editEmotionText" 
-              placeholder="Сегодня я чувствую..."
-            ></textarea>
-            <div class="modal-actions">
-              <button @click="saveEditedEmotion" class="styled-button">Сохранить</button>
-              <button @click="showEditModal = false" class="styled-button">Отмена</button>
-            </div>
-          </div>
-        </div>
-      </transition>
-
-      <!-- Модальное окно подтверждения удаления -->
-      <transition name="fade">
-        <div 
-          v-if="showDeleteModal" 
-          class="modal-overlay"
-          @click.self="showDeleteModal = false"
-        >
-          <div class="modal-content styled-modal">
-            <h3>Вы уверены, что хотите удалить запись?</h3>
-            <div class="modal-actions">
-              <button @click="deleteEmotion" class="styled-button">Удалить</button>
-              <button @click="showDeleteModal = false" class="styled-button">Отмена</button>
-            </div>
           </div>
         </div>
       </transition>
@@ -178,6 +140,7 @@ export default {
       loading: true,
       showEmotionModal: false,
       newEmotion: "",
+      forecast: "",
       user: {
         id: null,
         fullName: "Пользователь",
@@ -188,6 +151,9 @@ export default {
   computed: {
     reversedEmotions() {
       return [...this.user.emotions].reverse();
+    },
+    totalEmotions() {
+      return this.user.emotions.length;
     }
   },
   methods: {
@@ -224,9 +190,10 @@ export default {
 
     async loadUserData() {
       try {
-        const response = await fetch(`https://backend.com/user/${this.user.id}`);
+        const response = await fetch(`http://127.0.0.1:8000/api/user/${this.user.id}`);
         if (!response.ok) throw new Error("Ошибка загрузки пользователя");
-        this.user = await response.json();
+        const data = await response.json();
+        this.user = data;
       } catch (error) {
         console.error("Ошибка загрузки данных:", error);
       }
@@ -236,7 +203,7 @@ export default {
       if (!this.newEmotion.trim()) return;
 
       try {
-        const response = await fetch(`https://backend.com/emotion/`, {
+        const response = await fetch("http://127.0.0.1:8000/api/emotion", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -258,7 +225,7 @@ export default {
 
     async deleteEmotion(emotionId) {
       try {
-        const response = await fetch(`https://backend.com/emotion/${emotionId}`, {
+        const response = await fetch(`http://127.0.0.1:8000/api/emotion/${emotionId}`, {
           method: "DELETE"
         });
 
@@ -267,6 +234,23 @@ export default {
         this.user.emotions = this.user.emotions.filter(e => e.id !== emotionId);
       } catch (error) {
         console.error("Ошибка удаления эмоции:", error);
+      }
+    },
+
+    async generateForecast() {
+      try {
+        const response = await fetch("http://127.0.0.1:8000/api/generate-forecast", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ emotions: this.user.emotions.map(e => e.state) })
+        });
+
+        if (!response.ok) throw new Error("Ошибка генерации прогноза");
+
+        const data = await response.json();
+        this.forecast = data.forecast;
+      } catch (error) {
+        console.error("Ошибка при генерации прогноза:", error);
       }
     },
 
