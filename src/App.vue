@@ -1,173 +1,34 @@
 <template>
-  <div class="app-container">
-    <!-- Загрузчик -->
-    <div v-if="loading" class="loader">Загрузка...</div>
+  <div v-if="loading">Загрузка...</div>
+  <div v-else>
+    <h1>Привет, {{ user.fullName }}</h1>
+    <button @click="toggleEmotionWindow">Добавить эмоцию</button>
 
-    <!-- Основной контент -->
-    <template v-else>
-      <!-- Профиль -->
-      <transition name="slide-up" appear>
-        <div class="profile-section">
-          <h1 class="main-title">Личная карточка<span class="accent">✦</span></h1>
-          <div class="profile-card">
-            <img :src="user.avatar" class="user-avatar" alt="Аватар" />
-            <div class="user-info">
-              <h2 class="user-name">{{ user.fullName }}</h2>
-              <div class="user-stats">
-                <div class="stat-item">
-                  <span class="icon">✦</span>
-                  {{ user.daysOnPlatform }} {{ daysText }} на платформе
-                </div>
-                <div class="stat-item">
-                  <span class="icon">✦</span>
-                  Ваш запрос: {{ user.request }}
-                </div>
-              </div>
-              <!-- Кнопка "Изменить запрос" -->
-              <div class="button-container">
-                <button 
-                  @click="toggleRequestWindow" 
-                  :class="{ 'expanded': showRequestModal }" 
-                  class="change-request-button"
-                >
-                  {{ showRequestModal ? 'Закрыть' : 'Изменить запрос' }}
-                </button>
-                <transition name="expand">
-                  <div v-if="showRequestModal" class="request-window">
-                    <div class="requests-list">
-                      <button
-                        v-for="(request, index) in requests"
-                        :key="index"
-                        @click="selectRequest(request)"
-                        class="request-item"
-                      >
-                        {{ request }}
-                      </button>
-                    </div>
-                  </div>
-                </transition>
-              </div>
-            </div>
-          </div>
-        </div>
-      </transition>
+    <div v-if="showEmotionModal">
+      <input v-model="newEmotion" placeholder="Введите эмоцию" />
+      <button @click="addEmotion">Сохранить</button>
+      <button @click="toggleEmotionWindow">Отмена</button>
+    </div>
 
-      <!-- Прогноз -->
-      <transition name="slide-up" appear>
-        <div class="forecast-section">
-          <h2 class="section-title">Прогноз на день</h2>
-          <div class="forecast-card">
-            <div class="forecast-content">
-              <span class="forecast-icon">◎</span>
-              <p>{{ user.forecast || 'Сегодня будет прекрасный день!' }}</p>
-            </div>
-          </div>
-        </div>
-      </transition>
-
-      <!-- Эмоции -->
-      <transition name="slide-up" appear>
-        <div class="emotions-section">
-          <div class="emotions-header">
-            <h2 class="section-title">
-              <span class="title-line">Ведение эмоционального</span>
-              <span class="title-line">состояния<span class="accent">✦</span></span>
-            </h2>
-            <!-- Кнопка "Добавить эмоцию" -->
-            <div class="button-container">
-              <button 
-                @click="toggleEmotionWindow" 
-                :class="{ 'expanded': showEmotionModal }" 
-                class="add-button"
-              >
-                {{ showEmotionModal ? 'Закрыть' : '+ Добавить' }}
-              </button>
-              <transition name="expand">
-                <div v-if="showEmotionModal" class="emotion-window">
-                  <textarea 
-                    v-model="newEmotion" 
-                    placeholder="Сегодня я чувствую..."
-                    class="styled-textarea"
-                  ></textarea>
-                  <button @click="addEmotion" class="save-btn">Сохранить</button>
-                </div>
-              </transition>
-            </div>
-          </div>
-
-          <div class="emotions-table">
-            <div class="table-header">
-              <div class="day-col">День</div>
-              <div class="emotion-col">Эмоциональное состояние</div>
-              <div class="action-col"></div>
-            </div>
-
-            <transition-group name="list" tag="div">
-              <div 
-                v-for="(emotion, index) in reversedEmotions" 
-                :key="emotion.day" 
-                class="emotion-row"
-              >
-                <div class="day-col">{{ totalEmotions - index }}</div>
-                <div class="emotion-col">{{ emotion.state }}</div>
-                <div class="action-col">
-                  <button 
-                    class="edit-btn" 
-                    @click="openEditModal(index)"
-                  >
-                    ✎
-                  </button>
-                  <button 
-                    class="delete-btn" 
-                    @click="openDeleteModal(index)"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            </transition-group>
-          </div>
-        </div>
-      </transition>
-
-      <!-- Модальное окно редактирования -->
-      <transition name="fade">
-        <div 
-          v-if="showEditModal" 
-          class="modal-overlay"
-          @click.self="showEditModal = false"
-        >
-          <div class="modal-content styled-modal">
-            <h3>Редактировать состояние</h3>
-            <textarea 
-              v-model="editEmotionText" 
-              placeholder="Сегодня я чувствую..."
-            ></textarea>
-            <div class="modal-actions">
-              <button @click="saveEditedEmotion" class="styled-button">Сохранить</button>
-              <button @click="showEditModal = false" class="styled-button">Отмена</button>
-            </div>
-          </div>
-        </div>
-      </transition>
-
-      <!-- Модальное окно подтверждения удаления -->
-      <transition name="fade">
-        <div 
-          v-if="showDeleteModal" 
-          class="modal-overlay"
-          @click.self="showDeleteModal = false"
-        >
-          <div class="modal-content styled-modal">
-            <h3>Вы уверены, что хотите удалить запись?</h3>
-            <div class="modal-actions">
-              <button @click="deleteEmotion" class="styled-button">Удалить</button>
-              <button @click="showDeleteModal = false" class="styled-button">Отмена</button>
-            </div>
-          </div>
-        </div>
-      </transition>
-    </template>
+    <table>
+      <thead>
+        <tr>
+          <th>День</th>
+          <th>Состояние</th>
+          <th>Действия</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="(emotion, index) in reversedEmotions" :key="emotion.id">
+          <td>{{ index + 1 }}</td>
+          <td>{{ emotion.state }}</td>
+          <td>
+            <button @click="openEditModal(index)">✏️</button>
+            <button @click="deleteEmotion(emotion.id)">🗑️</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -176,100 +37,27 @@ export default {
   data() {
     return {
       loading: true,
-      showModal: false,
-      showRequestModal: false,
       showEmotionModal: false,
-      showEditModal: false,
-      showDeleteModal: false,
-      newEmotion: '',
-      editEmotionText: '',
-      isKeyboardOpen: false,
-      selectedEmotionIndex: null,
-      requests: [
-        'Любовь',
-        'Карьера',
-        'Здоровье',
-        'Финансы',
-        'Саморазвитие',
-        'Отношения'
-      ],
+      newEmotion: "",
       user: {
         id: null,
-        fullName: 'Тестовый пользователь',
-        avatar: '',
-        daysOnPlatform: 1,
-        request: 'любовь',
-        forecast: '',
-        emotions: [],
-        birthDate: null,
-        birthTime: null,
-        registrationDate: null
+        fullName: "Пользователь",
+        emotions: []
       }
     };
   },
   computed: {
     reversedEmotions() {
       return [...this.user.emotions].reverse();
-    },
-    totalEmotions() {
-      return this.user.emotions.length;
-    },
-    daysText() {
-      const days = this.user.daysOnPlatform;
-      const last = days % 10;
-      if (days > 10 && days < 20) return 'дней';
-      if (last === 1) return 'день';
-      if (last > 1 && last < 5) return 'дня';
-      return 'дней';
-    },
-    modalOverlayHeight() {
-      const baseHeight = window.innerWidth <= 600 ? 110 : 100;
-      const additionalHeight = this.totalEmotions * 5;
-      return `${baseHeight + additionalHeight}%`;
     }
-  },
-  methods: {
-    deleteEmotion(index) {
-      // Удаляем эмоцию по индексу
-      this.user.emotions.splice(index, 1);
-
-      // Обновляем номера дней для всех оставшихся записей
-      this.user.emotions.forEach((emotion, i) => {
-        emotion.day = i + 1;
-      });
-
-      // Сохраняем обновленные данные
-      this.saveUserData();
-    },
-
-    saveUserData() {
-      localStorage.setItem(this.user.id, JSON.stringify(this.user));
-    },
-
-    modalOverlayHeight() {
-      const baseHeight = window.innerWidth <= 600 ? 110 : 100;
-      const additionalHeight = this.totalEmotions * 5;
-      return `${baseHeight + additionalHeight}%`;
-    }
-  },
-  mounted() {
-    this.initializeApp();
-    window.addEventListener('resize', this.handleResize);
-    window.addEventListener('orientationchange', this.handleResize);
-  },
-  beforeDestroy() {
-    window.removeEventListener('resize', this.handleResize);
-    window.removeEventListener('orientationchange', this.handleResize);
   },
   methods: {
     async initializeApp() {
       try {
         await this.initTelegramUser();
-        this.loadUserData();
-        this.checkRegistration();
+        await this.loadUserData();
       } catch (error) {
-        console.error('Ошибка инициализации:', error);
-        this.setupFallbackUser();
+        console.error("Ошибка инициализации:", error);
       } finally {
         this.loading = false;
       }
@@ -280,168 +68,75 @@ export default {
         if (window.Telegram?.WebApp) {
           const tg = window.Telegram.WebApp;
           const user = tg.initDataUnsafe?.user;
-
           if (user) {
-            this.user.id = user.id || this.generateUserId();
-            this.user.fullName = [user.first_name, user.last_name].filter(Boolean).join(' ') || 'Пользователь';
-            this.user.avatar = user.photo_url || this.generateAvatar(user.first_name);
+            this.user.id = user.id;
+            this.user.fullName = `${user.first_name} ${user.last_name}`.trim() || "Пользователь";
             tg.expand();
             tg.enableClosingConfirmation();
             resolve();
           } else {
-            reject('Данные пользователя Telegram не доступны');
+            reject("Данные пользователя Telegram не доступны");
           }
         } else {
-          this.user.id = this.generateUserId();
-          resolve();
+          reject("Telegram WebApp не найден");
         }
       });
     },
 
-    toggleRequestWindow() {
-      this.showRequestModal = !this.showRequestModal;
+    async loadUserData() {
+      try {
+        const response = await fetch(`https://backend.com/user/${this.user.id}`);
+        if (!response.ok) throw new Error("Ошибка загрузки пользователя");
+        this.user = await response.json();
+      } catch (error) {
+        console.error("Ошибка загрузки данных:", error);
+      }
+    },
+
+    async addEmotion() {
+      if (!this.newEmotion.trim()) return;
+
+      try {
+        const response = await fetch(`https://backend.com/emotion/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            telegram_id: this.user.id,
+            state: this.newEmotion
+          })
+        });
+
+        if (!response.ok) throw new Error("Ошибка добавления эмоции");
+
+        const emotion = await response.json();
+        this.user.emotions.push(emotion);
+        this.newEmotion = "";
+        this.showEmotionModal = false;
+      } catch (error) {
+        console.error("Ошибка при добавлении эмоции:", error);
+      }
+    },
+
+    async deleteEmotion(emotionId) {
+      try {
+        const response = await fetch(`https://backend.com/emotion/${emotionId}`, {
+          method: "DELETE"
+        });
+
+        if (!response.ok) throw new Error("Ошибка удаления эмоции");
+
+        this.user.emotions = this.user.emotions.filter(e => e.id !== emotionId);
+      } catch (error) {
+        console.error("Ошибка удаления эмоции:", error);
+      }
     },
 
     toggleEmotionWindow() {
       this.showEmotionModal = !this.showEmotionModal;
-    },
-
-    openEditModal(index) {
-      this.selectedEmotionIndex = index;
-      this.editEmotionText = this.user.emotions[index].state;
-      this.showEditModal = true;
-    },
-
-    saveEditedEmotion() {
-      if (this.editEmotionText.trim()) {
-        this.user.emotions[this.selectedEmotionIndex].state = this.editEmotionText;
-        this.showEditModal = false;
-        this.saveUserData();
-      }
-    },
-
-    openDeleteModal(index) {
-      this.selectedEmotionIndex = index;
-      this.showDeleteModal = true;
-    },
-
-    deleteEmotion() {
-      this.user.emotions.splice(this.selectedEmotionIndex, 1);
-      this.user.emotions.forEach((emotion, i) => {
-        emotion.day = i + 1;
-      });
-      this.showDeleteModal = false;
-      this.saveUserData();
-    },
-
-    addEmotion() {
-      if (this.newEmotion.trim()) {
-        this.user.emotions.push({
-          day: this.user.emotions.length + 1,
-          state: this.newEmotion,
-          date: new Date().toISOString()
-        });
-        this.newEmotion = '';
-        this.showEmotionModal = false;
-        this.saveUserData();
-      }
-    },
-
-    selectRequest(request) {
-      this.user.request = request.toLowerCase();
-      this.showRequestModal = false;
-      this.saveUserData();
-    },
-
-    generateUserId() {
-      return 'user_' + Math.random().toString(36).substr(2, 9);
-    },
-
-    checkRegistration() {
-      if (!localStorage.getItem(this.user.id)) {
-        this.showRegistrationForm = true;
-      }
-    },
-
-    completeRegistration() {
-      if (this.validateRegistrationForm()) {
-        this.user = {
-          ...this.user,
-          fullName: `${this.registrationForm.firstName} ${this.registrationForm.lastName}`.trim(),
-          birthDate: this.registrationForm.birthDate,
-          birthTime: this.registrationForm.birthTime,
-          registrationDate: new Date().toISOString()
-        };
-        this.saveUserData();
-        this.showRegistrationForm = false;
-        if (window.Telegram?.WebApp) {
-          window.Telegram.WebApp.close();
-        }
-      }
-    },
-
-    validateRegistrationForm() {
-      return (
-        this.registrationForm.firstName.trim() &&
-        this.registrationForm.lastName.trim() &&
-        this.registrationForm.birthDate
-      );
-    },
-
-    saveUserData() {
-      localStorage.setItem(this.user.id, JSON.stringify(this.user));
-    },
-
-    handleResize() {
-      if (window.visualViewport) {
-        document.documentElement.style.height = `${window.visualViewport.height}px`;
-        window.scrollTo(0, 0);
-      }
-    },
-
-    generateAvatar(name) {
-      const canvas = document.createElement('canvas');
-      canvas.width = 100;
-      canvas.height = 100;
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#B566FF';
-      ctx.beginPath();
-      ctx.arc(50, 50, 50, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.fillStyle = 'white';
-      ctx.font = '40px Arial';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText((name?.[0] || 'U').toUpperCase(), 50, 50);
-      return canvas.toDataURL();
-    },
-
-    setupFallbackUser() {
-      this.user = {
-        ...this.user,
-        fullName: 'Тестовый Пользователь',
-        avatar: this.generateAvatar('Т')
-      };
-    },
-
-    loadUserData() {
-      const savedData = localStorage.getItem(this.user.id);
-      if (savedData) {
-        try {
-          this.user = JSON.parse(savedData);
-          this.updatePlatformDays();
-        } catch (e) {
-          console.error('Ошибка загрузки данных:', e);
-        }
-      }
-    },
-
-    updatePlatformDays() {
-      if (!this.user.registrationDate) return;
-      const diff = Date.now() - new Date(this.user.registrationDate).getTime();
-      this.user.daysOnPlatform = Math.floor(diff / (1000 * 3600 * 24)) + 1;
-      this.saveUserData();
     }
+  },
+  mounted() {
+    this.initializeApp();
   }
 };
 </script>
