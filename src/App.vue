@@ -6,129 +6,82 @@
     <!-- Основной контент -->
     <template v-else>
       <!-- Профиль -->
-      <transition name="slide-up" appear>
-        <div class="profile-section">
-          <h1 class="main-title">Личная карточка<span class="accent">✦</span></h1>
-          <div class="profile-card">
-            <img :src="user.avatar" class="user-avatar" alt="Аватар" />
-            <div class="user-info">
-              <h2 class="user-name">{{ user.fullName }}</h2>
-              <div class="user-stats">
-                <div class="stat-item">
-                  <span class="icon">✦</span>
-                  {{ user.daysOnPlatform }} {{ daysText }} на платформе
-                </div>
-                <div class="stat-item">
-                  <span class="icon">✦</span>
-                  Ваш запрос: {{ user.request }}
-                </div>
+      <div class="profile-section">
+        <h1 class="main-title">Личная карточка<span class="accent">✦</span></h1>
+        <div class="profile-card">
+          <img :src="user.avatar" class="user-avatar" alt="Аватар" />
+          <div class="user-info">
+            <h2 class="user-name">{{ user.fullName }}</h2>
+            <div class="user-stats">
+              <div class="stat-item">
+                <span class="icon">✦</span>
+                {{ user.daysOnPlatform }} {{ daysText }} на платформе
               </div>
-              <!-- Кнопка "Изменить запрос" -->
-              <div class="button-container">
-                <button 
-                  @click="toggleRequestWindow" 
-                  :class="{ 'expanded': showRequestModal }" 
-                  class="change-request-button"
-                >
-                  {{ showRequestModal ? 'Закрыть' : 'Изменить запрос' }}
-                </button>
-                <transition name="expand">
-                  <div v-if="showRequestModal" class="request-window">
-                    <div class="requests-list">
-                      <button
-                        v-for="(request, index) in requests"
-                        :key="index"
-                        @click="selectRequest(request)"
-                        class="request-item"
-                      >
-                        {{ request }}
-                      </button>
-                    </div>
-                  </div>
-                </transition>
+              <div class="stat-item">
+                <span class="icon">✦</span>
+                Ваш запрос: {{ user.request }}
               </div>
             </div>
           </div>
         </div>
-      </transition>
-
-      <!-- Прогноз -->
-      <transition name="slide-up" appear>
-        <div class="forecast-section">
-          <h2 class="section-title">Прогноз на день</h2>
-          <div class="forecast-card">
-            <div class="forecast-content">
-              <span class="forecast-icon">◎</span>
-              <p>{{ forecast || 'Сегодня будет прекрасный день!' }}</p>
-            </div>
-          </div>
-        </div>
-      </transition>
+      </div>
 
       <!-- Эмоции -->
-      <transition name="slide-up" appear>
-        <div class="emotions-section">
-          <div class="emotions-header">
-            <h2 class="section-title">
-              <span class="title-line">Ведение эмоционального</span>
-              <span class="title-line">состояния<span class="accent">✦</span></span>
-            </h2>
-            <!-- Кнопка "Добавить эмоцию" -->
-            <div class="button-container">
-              <button 
-                @click="toggleEmotionWindow" 
-                :class="{ 'expanded': showEmotionModal }" 
-                class="add-button"
-              >
-                {{ showEmotionModal ? 'Закрыть' : '+ Добавить' }}
-              </button>
-              <transition name="expand">
-                <div v-if="showEmotionModal" class="emotion-window">
-                  <textarea 
-                    v-model="newEmotion" 
-                    placeholder="Сегодня я чувствую..."
-                    class="styled-textarea"
-                  ></textarea>
-                  <button @click="addEmotion" class="save-btn">Сохранить</button>
-                </div>
-              </transition>
-            </div>
-          </div>
-
-          <div class="emotions-table">
-            <div class="table-header">
-              <div class="day-col">День</div>
-              <div class="emotion-col">Эмоциональное состояние</div>
-              <div class="action-col"></div>
-            </div>
-
-            <transition-group name="list" tag="div">
-              <div 
-                v-for="(emotion, index) in reversedEmotions" 
-                :key="emotion.id" 
-                class="emotion-row"
-              >
-                <div class="day-col">{{ totalEmotions - index }}</div>
-                <div class="emotion-col">{{ emotion.state }}</div>
-                <div class="action-col">
-                  <button 
-                    class="edit-btn" 
-                    @click="openEditModal(index)"
-                  >
-                    ✎
-                  </button>
-                  <button 
-                    class="delete-btn" 
-                    @click="deleteEmotion(emotion.id)"
-                  >
-                    🗑️
-                  </button>
-                </div>
+      <div class="emotions-section">
+        <div class="emotions-header">
+          <h2 class="section-title">
+            <span class="title-line">Ведение эмоционального</span>
+            <span class="title-line">состояния<span class="accent">✦</span></span>
+          </h2>
+          <!-- Кнопка "Добавить эмоцию" -->
+          <div class="button-container">
+            <button 
+              @click="toggleEmotionWindow" 
+              :class="{ 'expanded': showEmotionModal }" 
+              class="add-button"
+            >
+              {{ showEmotionModal ? 'Закрыть' : '+ Добавить' }}
+            </button>
+            <transition name="expand">
+              <div v-if="showEmotionModal" class="emotion-window">
+                <textarea 
+                  v-model="newEmotion" 
+                  placeholder="Сегодня я чувствую..."
+                  class="styled-textarea"
+                ></textarea>
+                <button @click="addEmotion" class="save-btn">Сохранить</button>
               </div>
-            </transition-group>
+            </transition>
           </div>
         </div>
-      </transition>
+
+        <div class="emotions-table">
+          <div class="table-header">
+            <div class="day-col">День</div>
+            <div class="emotion-col">Эмоциональное состояние</div>
+            <div class="action-col"></div>
+          </div>
+
+          <transition-group name="list" tag="div">
+            <div 
+              v-for="(emotion, index) in reversedEmotions" 
+              :key="emotion.id" 
+              class="emotion-row"
+            >
+              <div class="day-col">{{ totalEmotions - index }}</div>
+              <div class="emotion-col">{{ emotion.state }}</div>
+              <div class="action-col">
+                <button 
+                  class="delete-btn" 
+                  @click="deleteEmotion(emotion.id)"
+                >
+                  🗑️
+                </button>
+              </div>
+            </div>
+          </transition-group>
+        </div>
+      </div>
     </template>
   </div>
 </template>
@@ -140,10 +93,10 @@ export default {
       loading: true,
       showEmotionModal: false,
       newEmotion: "",
-      forecast: "",
       user: {
         id: null,
         fullName: "Пользователь",
+        avatar: "",
         emotions: []
       }
     };
@@ -176,6 +129,7 @@ export default {
           if (user) {
             this.user.id = user.id;
             this.user.fullName = `${user.first_name} ${user.last_name}`.trim() || "Пользователь";
+            this.user.avatar = user.photo_url || "";
             tg.expand();
             tg.enableClosingConfirmation();
             resolve();
@@ -193,14 +147,17 @@ export default {
         const response = await fetch(`http://127.0.0.1:8000/api/user/${this.user.id}`);
         if (!response.ok) throw new Error("Ошибка загрузки пользователя");
         const data = await response.json();
-        this.user = data;
+        this.user = { ...this.user, ...data };
       } catch (error) {
         console.error("Ошибка загрузки данных:", error);
       }
     },
 
     async addEmotion() {
-      if (!this.newEmotion.trim()) return;
+      if (!this.newEmotion.trim()) {
+        alert("Поле эмоции не может быть пустым!");
+        return;
+      }
 
       try {
         const response = await fetch("http://127.0.0.1:8000/api/emotion", {
@@ -209,7 +166,7 @@ export default {
           body: JSON.stringify({
             telegram_id: this.user.id,
             state: this.newEmotion
-          })
+          }),
         });
 
         if (!response.ok) throw new Error("Ошибка добавления эмоции");
@@ -220,6 +177,7 @@ export default {
         this.showEmotionModal = false;
       } catch (error) {
         console.error("Ошибка при добавлении эмоции:", error);
+        alert("Не удалось добавить эмоцию. Попробуйте снова.");
       }
     },
 
@@ -234,23 +192,7 @@ export default {
         this.user.emotions = this.user.emotions.filter(e => e.id !== emotionId);
       } catch (error) {
         console.error("Ошибка удаления эмоции:", error);
-      }
-    },
-
-    async generateForecast() {
-      try {
-        const response = await fetch("http://127.0.0.1:8000/api/generate-forecast", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ emotions: this.user.emotions.map(e => e.state) })
-        });
-
-        if (!response.ok) throw new Error("Ошибка генерации прогноза");
-
-        const data = await response.json();
-        this.forecast = data.forecast;
-      } catch (error) {
-        console.error("Ошибка при генерации прогноза:", error);
+        alert("Не удалось удалить эмоцию. Попробуйте снова.");
       }
     },
 
@@ -263,6 +205,7 @@ export default {
   }
 };
 </script>
+
 
 <style>
 * {
