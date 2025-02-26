@@ -139,6 +139,7 @@ export default {
     return {
       loading: true,
       showEmotionModal: false,
+      showRequestModal: false, // Add this line to manage the request modal state
       newEmotion: "",
       forecast: "",
       user: {
@@ -146,7 +147,15 @@ export default {
         fullName: "Пользователь",
         avatar: "",
         emotions: []
-      }
+      },
+      requests: [
+        'Любовь',
+        'Карьера',
+        'Здоровье',
+        'Финансы',
+        'Саморазвитие',
+        'Отношения'
+      ]
     };
   },
   computed: {
@@ -264,6 +273,15 @@ export default {
 
     toggleEmotionWindow() {
       this.showEmotionModal = !this.showEmotionModal;
+    },
+
+    toggleRequestWindow() {
+      this.showRequestModal = !this.showRequestModal;
+    },
+
+    selectRequest(request) {
+      this.user.request = request;
+      this.showRequestModal = false;
     }
   },
   mounted() {
@@ -331,10 +349,11 @@ html, body {
 
 .request-window,
 .emotion-window {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
+  /* Center the modal */
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
   animation: gradient 4s ease infinite;
   border-radius: 0 0 25px 25px;
@@ -343,6 +362,7 @@ html, body {
   transform-origin: top;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
+
 
 .requests-list,
 .emotion-window {
