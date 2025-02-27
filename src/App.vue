@@ -139,14 +139,16 @@ export default {
     return {
       loading: true,
       showEmotionModal: false,
-      showRequestModal: false, // Add this line to manage the request modal state
+      showRequestModal: false,
       newEmotion: "",
       forecast: "",
       user: {
         id: null,
         fullName: "Пользователь",
         avatar: "",
-        emotions: []
+        emotions: [],
+        daysOnPlatform: 0,
+        request: "Любовь",
       },
       requests: [
         'Любовь',
@@ -164,6 +166,12 @@ export default {
     },
     totalEmotions() {
       return this.user.emotions.length;
+    },
+    daysText() {
+      const days = this.user.daysOnPlatform;
+      if (days % 10 === 1 && days % 100 !== 11) return "день";
+      if ([2, 3, 4].includes(days % 10) && ![12, 13, 14].includes(days % 100)) return "дня";
+      return "дней";
     }
   },
   methods: {
@@ -186,9 +194,9 @@ export default {
           if (user) {
             this.user.id = user.id;
             this.user.fullName = `${user.first_name} ${user.last_name}`.trim() || "Пользователь";
-            this.user.avatar = user.photo_url || ""; // Загружаем аватарку
-            tg.expand();
-            tg.enableClosingConfirmation();
+            this.user.avatar = user.photo_url || "";
+            tg.expand(); // Развернуть приложение на весь экран
+            tg.enableClosingConfirmation(); // Включить подтверждение закрытия
             resolve();
           } else {
             reject("Данные пользователя Telegram не доступны");
@@ -212,7 +220,7 @@ export default {
 
     async addEmotion() {
       if (!this.newEmotion.trim()) {
-        alert("Поле эмоции не может быть пустым!");
+        this.showAlert("Поле эмоции не может быть пустым!");
         return;
       }
 
@@ -234,7 +242,7 @@ export default {
         this.showEmotionModal = false;
       } catch (error) {
         console.error("Ошибка при добавлении эмоции:", error);
-        alert("Не удалось добавить эмоцию. Попробуйте снова.");
+        this.showAlert("Не удалось добавить эмоцию. Попробуйте снова.");
       }
     },
 
@@ -249,7 +257,7 @@ export default {
         this.user.emotions = this.user.emotions.filter(e => e.id !== emotionId);
       } catch (error) {
         console.error("Ошибка удаления эмоции:", error);
-        alert("Не удалось удалить эмоцию. Попробуйте снова.");
+        this.showAlert("Не удалось удалить эмоцию. Попробуйте снова.");
       }
     },
 
@@ -267,7 +275,7 @@ export default {
         this.forecast = data.forecast;
       } catch (error) {
         console.error("Ошибка при генерации прогноза:", error);
-        alert("Не удалось сгенерировать прогноз. Попробуйте снова.");
+        this.showAlert("Не удалось сгенерировать прогноз. Попробуйте снова.");
       }
     },
 
@@ -282,6 +290,14 @@ export default {
     selectRequest(request) {
       this.user.request = request;
       this.showRequestModal = false;
+    },
+
+    showAlert(message) {
+      if (window.Telegram?.WebApp) {
+        window.Telegram.WebApp.showAlert(message);
+      } else {
+        alert(message);
+      }
     }
   },
   mounted() {
@@ -289,6 +305,7 @@ export default {
   }
 };
 </script>
+
 <style>
 * {
   box-sizing: border-box;
@@ -349,20 +366,17 @@ html, body {
 
 .request-window,
 .emotion-window {
-  /* Center the modal */
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
-  animation: gradient 4s ease infinite;
   border-radius: 0 0 25px 25px;
   overflow: hidden;
-  z-index: 0;
+  z-index: 10;
   transform-origin: top;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
-
 
 .requests-list,
 .emotion-window {
@@ -371,6 +385,7 @@ html, body {
 
 .request-item,
 .save-btn {
+  width: 100%;
   padding: 8px 12px;
   border: none;
   border-radius: 5px;
@@ -379,6 +394,7 @@ html, body {
   color: white;
   text-align: center;
   transition: background 0.3s ease;
+  margin-bottom: 5px;
 }
 
 .request-item:hover,
@@ -394,47 +410,9 @@ html, body {
   border-radius: 8px;
   margin-bottom: 10px;
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
-  animation: gradient 4s ease infinite;
-}
-
-.styled-modal {
-  width: 90%;
-  max-width: 400px;
-  padding: 20px;
-  border-radius: 8px;
-  background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
-  animation: gradient 4s ease infinite;
-  position: absolute;
-  top: 10%;
-  left: 50%;
-  transform: translateX(-50%);
-}
-
-.styled-textarea {
-  width: 100%;
-  height: 100px;
-  padding: 12px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  margin-bottom: 10px;
-  background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
-  animation: gradient 4s ease infinite;
-}
-
-.styled-button {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  background: #fb0eff;
   color: white;
-  transition: background 0.3s ease;
-  margin: 5px;
 }
 
-.styled-button:hover {
-  background: #e62ee6;
-}
 .expand-enter-active,
 .expand-leave-active {
   transition: all 0.3s ease;
@@ -452,7 +430,6 @@ html, body {
   transform: scaleY(1);
 }
 
-/* Анимация списка */
 .list-enter-active,
 .list-leave-active {
   transition: all 0.4s ease;
@@ -473,7 +450,6 @@ html, body {
   transition: transform 0.4s ease;
 }
 
-/* Анимация появления */
 .slide-up-enter-active,
 .slide-up-leave-active {
   transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -484,7 +460,6 @@ html, body {
   transform: translateY(40px);
 }
 
-/* Анимация fade */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;
@@ -521,8 +496,6 @@ html, body {
   align-items: center;
   gap: 15px;
   padding: 15px;
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 4s ease infinite;
@@ -579,8 +552,6 @@ html, body {
 
 .forecast-card {
   padding: 15px;
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 4s ease infinite;
@@ -609,8 +580,6 @@ html, body {
 }
 
 .emotions-table {
-  -webkit-text-size-adjust: 100%;
-  -webkit-tap-highlight-color: transparent;
   background: linear-gradient(45deg, #1f5bfe, #741efe, #6c11ff);
   background-size: 400% 400%;
   animation: gradient 4s ease infinite;
