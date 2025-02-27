@@ -209,10 +209,17 @@ export default {
 
     async loadUserData() {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/user/${this.user.id}`);
-        if (!response.ok) throw new Error("Ошибка загрузки пользователя");
-        const data = await response.json();
-        this.user = { ...this.user, ...data };
+        // Загрузка данных пользователя
+        const userResponse = await fetch(`http://127.0.0.1:8000/user/${this.user.id}`);
+        if (!userResponse.ok) throw new Error("Ошибка загрузки пользователя");
+        const userData = await userResponse.json();
+        this.user = { ...this.user, ...userData };
+
+        // Загрузка эмоций пользователя
+        const emotionsResponse = await fetch(`http://127.0.0.1:8000/emotions/${this.user.id}`);
+        if (!emotionsResponse.ok) throw new Error("Ошибка загрузки эмоций");
+        const emotionsData = await emotionsResponse.json();
+        this.user.emotions = emotionsData;
       } catch (error) {
         console.error("Ошибка загрузки данных:", error);
       }
@@ -225,7 +232,7 @@ export default {
       }
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/emotion", {
+        const response = await fetch("http://127.0.0.1:8000/emotion/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -248,7 +255,7 @@ export default {
 
     async deleteEmotion(emotionId) {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/api/emotion/${emotionId}`, {
+        const response = await fetch(`http://127.0.0.1:8000/emotion/${emotionId}`, {
           method: "DELETE"
         });
 
@@ -263,12 +270,7 @@ export default {
 
     async generateForecast() {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/generate-forecast", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ emotions: this.user.emotions.map(e => e.state) })
-        });
-
+        const response = await fetch(`http://127.0.0.1:8000/generate-forecast/${this.user.id}`);
         if (!response.ok) throw new Error("Ошибка генерации прогноза");
 
         const data = await response.json();
