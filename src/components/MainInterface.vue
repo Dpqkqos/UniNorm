@@ -134,6 +134,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   data() {
     return {
@@ -150,14 +152,7 @@ export default {
         daysOnPlatform: 0,
         request: "Любовь",
       },
-      requests: [
-        'Любовь',
-        'Карьера',
-        'Здоровье',
-        'Финансы',
-        'Саморазвитие',
-        'Отношения'
-      ]
+      requests: ["Любовь", "Карьера", "Здоровье", "Финансы", "Саморазвитие", "Отношения"],
     };
   },
   computed: {
@@ -172,7 +167,7 @@ export default {
       if (days % 10 === 1 && days % 100 !== 11) return "день";
       if ([2, 3, 4].includes(days % 10) && ![12, 13, 14].includes(days % 100)) return "дня";
       return "дней";
-    }
+    },
   },
   methods: {
     async initializeApp() {
@@ -190,36 +185,31 @@ export default {
       return new Promise((resolve, reject) => {
         if (window.Telegram?.WebApp) {
           const tg = window.Telegram.WebApp;
-          const user = tg.initDataUnsafe?.user;
-          if (user) {
-            this.user.id = user.id;
-            this.user.fullName = `${user.first_name} ${user.last_name}`.trim() || "Пользователь";
-            this.user.avatar = user.photo_url || "";
-            tg.expand(); // Развернуть приложение на весь экран
-            tg.enableClosingConfirmation(); // Включить подтверждение закрытия
-            resolve();
-          } else {
-            reject("Данные пользователя Telegram не доступны");
-          }
+          const initData = JSON.parse(tg.initDataUnsafe);
+          this.user.id = initData.user.id;
+          this.user.fullName = `${initData.user.first_name} ${initData.user.last_name}`.trim() || "Пользователь";
+          this.user.avatar = initData.user.photo_url || "";
+
+          // Развернуть приложение на весь экран
+          tg.expand();
+
+          // Включить подтверждение закрытия
+          tg.enableClosingConfirmation();
+
+          resolve();
         } else {
-          reject("Telegram WebApp не найден");
+          reject("Telegram Web App не найден");
         }
       });
     },
 
     async loadUserData() {
       try {
-        // Загрузка данных пользователя
-        const userResponse = await fetch(`http://127.0.0.1:8000/user/${this.user.id}`);
-        if (!userResponse.ok) throw new Error("Ошибка загрузки пользователя");
-        const userData = await userResponse.json();
-        this.user = { ...this.user, ...userData };
+        const userResponse = await axios.get(`uniback-production.up.railway.app/user/${this.user.id}`);
+        this.user = { ...this.user, ...userResponse.data };
 
-        // Загрузка эмоций пользователя
-        const emotionsResponse = await fetch(`http://127.0.0.1:8000/emotions/${this.user.id}`);
-        if (!emotionsResponse.ok) throw new Error("Ошибка загрузки эмоций");
-        const emotionsData = await emotionsResponse.json();
-        this.user.emotions = emotionsData;
+        const emotionsResponse = await axios.get(`uniback-production.up.railway.app/emotions/${this.user.id}`);
+        this.user.emotions = emotionsResponse.data;
       } catch (error) {
         console.error("Ошибка загрузки данных:", error);
       }
@@ -232,19 +222,12 @@ export default {
       }
 
       try {
-        const response = await fetch("http://127.0.0.1:8000/emotion/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            telegram_id: this.user.id,
-            state: this.newEmotion
-          })
+        const response = await axios.post("uniback-production.up.railway.app/emotion/", {
+          telegram_id: this.user.id,
+          state: this.newEmotion,
         });
 
-        if (!response.ok) throw new Error("Ошибка добавления эмоции");
-
-        const emotion = await response.json();
-        this.user.emotions.push(emotion);
+        this.user.emotions.push(response.data);
         this.newEmotion = "";
         this.showEmotionModal = false;
       } catch (error) {
@@ -255,13 +238,8 @@ export default {
 
     async deleteEmotion(emotionId) {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/emotion/${emotionId}`, {
-          method: "DELETE"
-        });
-
-        if (!response.ok) throw new Error("Ошибка удаления эмоции");
-
-        this.user.emotions = this.user.emotions.filter(e => e.id !== emotionId);
+        await axios.delete(`uniback-production.up.railway.app/emotion/${emotionId}`);
+        this.user.emotions = this.user.emotions.filter((e) => e.id !== emotionId);
       } catch (error) {
         console.error("Ошибка удаления эмоции:", error);
         this.showAlert("Не удалось удалить эмоцию. Попробуйте снова.");
@@ -270,11 +248,8 @@ export default {
 
     async generateForecast() {
       try {
-        const response = await fetch(`http://127.0.0.1:8000/generate-forecast/${this.user.id}`);
-        if (!response.ok) throw new Error("Ошибка генерации прогноза");
-
-        const data = await response.json();
-        this.forecast = data.forecast;
+        const response = await axios.get(`uniback-production.up.railway.app/forecast/${this.user.id}`);
+        this.forecast = response.data.forecast;
       } catch (error) {
         console.error("Ошибка при генерации прогноза:", error);
         this.showAlert("Не удалось сгенерировать прогноз. Попробуйте снова.");
@@ -300,11 +275,11 @@ export default {
       } else {
         alert(message);
       }
-    }
+    },
   },
   mounted() {
     this.initializeApp();
-  }
+  },
 };
 </script>
 
